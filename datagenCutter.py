@@ -179,7 +179,7 @@ def generate_cut_strings(seqLength,alphabet_size,delta,numSeq,num_traces,train_s
                     frag_train_label = frag_train_label + '\n' + formater(fraglabel[i])
                     for j in range(num_traces):
                         frag_train_trace[j] = frag_train_trace[j] + '\n' + formater(fragtrace[j][i])
-    print(frag_train_trace)        
+          
 
     #####EVAL   
     for i in range(int(numSeq*val_size)):
