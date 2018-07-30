@@ -49,7 +49,7 @@ def avg_edit(assembled_f,labels_f,seqnum):
     for i in range(seqnum):
         seqLength = len(labels_f[i]) 
         avg = avg + float(lv.distance(assembled_f[i],labels_f[i]) / seqLength)
-        avg = avg/seqnum
+    avg = float(avg/seqnum)
     return avg
 
 def create_summary(avg,seqnum,outdir):
