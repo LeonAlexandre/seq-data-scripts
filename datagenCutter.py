@@ -59,7 +59,7 @@ def parse_arguments():
     parser.add_argument('--overlap',dest="overlap",help='overlap rate of the fragments as 0.x (int)',type=float,default=0.1)
     parser.add_argument('--ranged_mode',dest="ranged_mode",help='Enables ranged mode (bool)',type=bool,default=False)
     parser.add_argument('--start_len',dest="start_len",help='starting length (int)',type=int,default=100)
-    parser.add_argument('--end_len',dest="end_len",help='ending length(int)',type=int,default=101)
+    parser.add_argument('--end_len',dest="end_len",help='ending length(int)',type=int,default=100)
     parser.add_argument('--step',dest="step",help='step size wthin range (int)',type=int,default=1)
 
     return parser.parse_args()
