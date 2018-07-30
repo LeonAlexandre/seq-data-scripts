@@ -57,7 +57,7 @@ def create_summary(avg,seqnum,outdir):
     
     summary = 'Dataset Report' 
     summary = summary + '\nAverage edit distance = ' + str(avg)
-    summary = summary + '\nNumber of sequences = ' + str(seqnum)
+    summary = summary + '\nNumber of sequences =   ' + str(seqnum)
     
     current = os.getcwd()
     name = current + '/' + outdir + '/' +'Inference_Summary.txt'
@@ -79,7 +79,7 @@ labels_f, seqnum2 = read_list(labels)
 if not seqnum1==seqnum2:
     print('number of sequences not equal. redo assembly?')
 else:
-    print("Number of sequences" + str(seqnum1))
+    print("Number of sequences " + str(seqnum1))
 
 avg = avg_edit(assembled_f,labels_f,seqnum1)
 

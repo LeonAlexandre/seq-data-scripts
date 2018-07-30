@@ -28,25 +28,7 @@ def parse_arguments():
     ##PARSING THROUGH THE ARGUMENTS
     #initialize the parser
     parser = argparse.ArgumentParser()
-    #Adding arguments
-    #parser.add_argument("name", help="any help", type=str)
     #acces by args.name
-    """
-    parser.add_argument("outdir",help='output directory(str)', type=str)
-    parser.add_argument("seqLength",help='length of original sequence(int)',type=int)
-    parser.add_argument("alphabet_size" ,help="alphabet size (int)",type=int)
-    parser.add_argument("delta",help='deletion probability (float)',type=float)
-    parser.add_argument("numSeq",help='number of original sequences (int)',type=int)
-    parser.add_argument("num_traces",help='number of traces per sequence (int)',type=int)
-    parser.add_argument("train_size",help='percentage of numSeq in the training set as 0.x (float)',type=float)
-    parser.add_argument("val_size",help='percentage of numSeq in the validation set as 0.x (float)',type=float)
-    parser.add_argument("fragnum",help='Number of fragments per sequence (int)',type=int)
-    parser.add_argument("overlap",help='overlap rate of the fragments as 0.x (int)',type=float)
-    parser.add_argument("ranged_mode",help='Enables ranged mode (bool)',type=bool)
-    parser.add_argument("start_len",help='starting length (int)',type=int)
-    parser.add_argument("end_len",help='ending length(int)',type=int)
-    parser.add_argument("step",help='step size wthin range (int)',type=int)
-    """
     parser.add_argument('--out_dir',dest="outdir",help='output directory(str)', type=str,default='newdata')
     parser.add_argument('--seqLength',dest="seqLength",help='length of original sequence(int)',type=int,default=100)
     parser.add_argument("--alphabetSize",dest="alphabet_size" ,help="alphabet size (int)",type=int,default=2)

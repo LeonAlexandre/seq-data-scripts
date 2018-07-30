@@ -144,7 +144,6 @@ inf_list, seqnum = inference_list(f_in,fragnum)
 reconstructed = reconstruct(inf_list,seqnum)
 
 
-outdir = 'my_dir'
 
 f_out = create_file(outdir)
 
