@@ -31,6 +31,7 @@ def parse_arguments():
     #Adding arguments
     #parser.add_argument("name", help="any help", type=str)
     #acces by args.name
+    """
     parser.add_argument("outdir",help='output directory(str)', type=str)
     parser.add_argument("seqLength",help='length of original sequence(int)',type=int)
     parser.add_argument("alphabet_size" ,help="alphabet size (int)",type=int)
@@ -45,7 +46,21 @@ def parse_arguments():
     parser.add_argument("start_len",help='starting length (int)',type=int)
     parser.add_argument("end_len",help='ending length(int)',type=int)
     parser.add_argument("step",help='step size wthin range (int)',type=int)
-
+    """
+    parser.add_argument('--out_dir',dest="outdir",help='output directory(str)', type=str,default='newdata')
+    parser.add_argument('--seqLength',dest="seqLength",help='length of original sequence(int)',type=int,default=100)
+    parser.add_argument("--alphabetSize",dest="alphabet_size" ,help="alphabet size (int)",type=int,default=2)
+    parser.add_argument('--delta',dest="delta",help='deletion probability (float)',type=float,default=0)
+    parser.add_argument('--numSeq',dest="numSeq",help='number of original sequences (int)',type=int,default=100)
+    parser.add_argument('--numTraces',dest="num_traces",help='number of traces per sequence (int)',type=int,default=1)
+    parser.add_argument('--train_size',dest="train_size",help='percentage of numSeq in the training set as 0.x (float)',type=float,default=0.6)
+    parser.add_argument('--val_size',dest="val_size",help='percentage of numSeq in the validation set as 0.x (float)',type=float,default=0.2)
+    parser.add_argument('--fragNum',dest="fragnum",help='Number of fragments per sequence (int)',type=int,default=5)
+    parser.add_argument('--overlap',dest="overlap",help='overlap rate of the fragments as 0.x (int)',type=float,default=0.1)
+    parser.add_argument('--ranged_mode',dest="ranged_mode",help='Enables ranged mode (bool)',type=bool,default=False)
+    parser.add_argument('--start_len',dest="start_len",help='starting length (int)',type=int,default=100)
+    parser.add_argument('--end_len',dest="end_len",help='ending length(int)',type=int,default=101)
+    parser.add_argument('--step',dest="step",help='step size wthin range (int)',type=int,default=1)
 
     return parser.parse_args()
 
