@@ -32,9 +32,9 @@ def parse_arguments():
     #Adding arguments
     #parser.add_argument("name", help="any help", type=str)
     #acces by args.name
-    parser.add_argument("outdir",help='output directory', type=str)
-    parser.add_argument("f_in",help='inference input file location',type=str)
-    parser.add_argument("fragnum",help='number of fragments as int',type=int)
+    parser.add_argument('--outdir',dest="outdir",help='output directory', type=str,default='newdata')
+    parser.add_argument('--f_inference',dest="f_in",help='inference input file location',type=str,default='test_output.txt')
+    parser.add_argument('--fragnum',dest="fragnum",help='number of fragments as int',type=int,default=1)
 
     return parser.parse_args()
 
@@ -64,7 +64,7 @@ def inference_list(f_in,fragnum):
     #read lines in a lsit
     #split the list according to fragnum (list of list)
     current = os.getcwd()
-    inference_file = open(current + f_in,'r')
+    inference_file = open(current + '/' + f_in,'r')
     lines = inference_file.readlines()
 
     inf_list = []

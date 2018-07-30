@@ -26,9 +26,9 @@ def parse_arguments():
     #Adding arguments
     #parser.add_argument("name", help="any help", type=str)
     #acces by args.name
-    parser.add_argument("outdir",help='output directory', type=str)
-    parser.add_argument("assembled",help='assembled output',type=str)
-    parser.add_argument("labels",help='labels output',type=str)
+    parser.add_argument("--outdir",dest="outdir",help='output directory', type=str,default='newdata')
+    parser.add_argument('--assembled',dest="assembled",help='assembled output',type=str,default='please_specify_file.txt')
+    parser.add_argument('--labels',dest="labels",help='labels output',type=str,default='please_specify_labels.txt')
 
     return parser.parse_args()
 
@@ -36,7 +36,7 @@ def read_list(input_file):
     #read lines in a list
     #split the list according to fragnum (list of list)
     current = os.getcwd()
-    inference_file = open(current + input_file,'r')
+    inference_file = open(current + '/' + input_file,'r')
     lines = inference_file.readlines()
     seqnum = len(lines)
 
