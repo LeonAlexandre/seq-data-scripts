@@ -1,5 +1,3 @@
-
-#Hey I changed it!
 #Cutter program
 #generates a multi trace dataset
 #generates files that are cut and the originals with them
@@ -9,7 +7,8 @@
 args: out_dir
 args: seqlenght, alphabet, delta, 
     size, train_split, val_split , fragnum, overlap
-
+#arguments for the ranged version
+args: range_mode start_len end_len step
 
 """
 #Imports
@@ -22,7 +21,7 @@ import os
 def parse_arguments():
     """
     arguments: outdir, seqLength,alphabet_size,delta,numSeq,num_traces,train_size,val_size,fragnum,overlap
-    
+    args: range_mode start_len end_len step 
 
 
     """
@@ -32,16 +31,21 @@ def parse_arguments():
     #Adding arguments
     #parser.add_argument("name", help="any help", type=str)
     #acces by args.name
-    parser.add_argument("outdir",help='output directory', type=str)
-    parser.add_argument("seqLength",help='length of original sequence',type=int)
-    parser.add_argument("alphabet_size",type=int)
-    parser.add_argument("delta",help='deletion probability',type=float)
-    parser.add_argument("numSeq",help='number of original sequences',type=int)
-    parser.add_argument("num_traces",help='number of traces per sequence',type=int)
-    parser.add_argument("train_size",help='percentage of numSeq in the training set as 0.x',type=float)
-    parser.add_argument("val_size",help='percentage of numSeq in the validation set as 0.x',type=float)
-    parser.add_argument("fragnum",help='Number of fragments per sequence',type=int)
-    parser.add_argument("overlap",help='overlap rate of the fragments as 0.x',type=float)
+    parser.add_argument("outdir",help='output directory(str)', type=str)
+    parser.add_argument("seqLength",help='length of original sequence(int)',type=int)
+    parser.add_argument("alphabet_size" ,help="alphabet size (int)",type=int)
+    parser.add_argument("delta",help='deletion probability (float)',type=float)
+    parser.add_argument("numSeq",help='number of original sequences (int)',type=int)
+    parser.add_argument("num_traces",help='number of traces per sequence (int)',type=int)
+    parser.add_argument("train_size",help='percentage of numSeq in the training set as 0.x (float)',type=float)
+    parser.add_argument("val_size",help='percentage of numSeq in the validation set as 0.x (float)',type=float)
+    parser.add_argument("fragnum",help='Number of fragments per sequence (int)',type=int)
+    parser.add_argument("overlap",help='overlap rate of the fragments as 0.x (int)',type=float)
+    parser.add_argument("ranged_mode",help='Enables ranged mode (bool)',type=bool)
+    parser.add_argument("start_len",help='starting length (int)',type=int)
+    parser.add_argument("end_len",help='ending length(int)',type=int)
+    parser.add_argument("step",help='step size wthin range (int)',type=int)
+
 
     return parser.parse_args()
 
@@ -291,7 +295,203 @@ def generate_cut_strings(seqLength,alphabet_size,delta,numSeq,num_traces,train_s
     return (train_label, train_trace, val_label, val_trace, test_label, test_trace, frag_train_label ,frag_train_trace,
         frag_val_label ,frag_val_trace ,frag_test_label, frag_test_trace  )
 
+def generate_cut_strings_ranged(args):
+    #unpack arguments
+    #previous args
+    alphabet_size = args.alphabet_size
+    delta = args.delta
+    numSeq = args.numSeq
+    num_traces = args.num_traces
+    train_size = args.train_size
+    val_size = args.val_size
+    fragnum =args.fragnum
+    overlap = args.overlap
 
+    start_len = args.start_len
+    end_len = args.end_len
+    step = args.step
+    
+    #time to generalize this baby
+    train_label = ''
+    train_trace = [''] * num_traces
+    val_label = ''
+    val_trace = [''] * num_traces
+    test_label = ''
+    test_trace = [''] * num_traces
+    
+    frag_train_label = ''
+    frag_train_trace = [''] * num_traces
+ 
+
+    frag_val_label = ''
+    frag_val_trace = [''] * num_traces
+    
+    frag_test_label = ''
+    frag_test_trace = [''] * num_traces
+
+    #make a progressions cheme
+    pieceNum = int((end_len - start_len) / step) + 1
+    train_numSeq = int(numSeq * train_size / pieceNum)
+    val_numSeq = int(numSeq * val_size / pieceNum)
+    test_numSeq = int(numSeq * (1 - train_size - val_size) / pieceNum)
+    
+    ####TRAIN
+    for pieceCount in range(pieceNum):
+        seqLength = start_len + (pieceCount * step)   
+        for i in range(train_numSeq):
+            #intact
+            label = randomSequence(seqLength,alphabet_size)
+            #generate a list of traces
+            trace = [''] * num_traces
+            for i in range(num_traces):
+                trace[i] = deletionChannel(label,delta)
+            
+            #fragmented
+            fragtrace = [''] * num_traces
+            
+            fraglabel = cut_data(label,fragnum,overlap)
+            for i in range(num_traces):
+                fragtrace[i] = cut_data(trace[i],fragnum,overlap)
+            
+            #generate intact 'file' (really just a string)
+            
+            if not '' in trace:
+                label = formater(label)
+                train_label = train_label + '\n' + label
+                for i in range(num_traces):
+                    trace[i] = formater(trace[i])                
+                    train_trace[i] = train_trace[i] + '\n' + trace[i]
+            
+            
+            keep = True
+            #generate a list with all the fragments
+            if not '' in trace:
+                #keep = False
+                for x in range(len(fragtrace)):
+                    if  '' in fragtrace[x] :
+                        keep = False
+            
+            if keep:
+                
+                for i in range(fragnum):
+                        frag_train_label = frag_train_label + '\n' + formater(fraglabel[i])
+                        for j in range(num_traces):
+                            frag_train_trace[j] = frag_train_trace[j] + '\n' + formater(fragtrace[j][i])
+          
+
+    #####EVAL   
+    for pieceCount in range(pieceNum):
+        seqLength = start_len + (pieceCount * step)
+        for i in range(val_numSeq):
+            #intact
+            label = randomSequence(seqLength,alphabet_size)
+            #generate a list of traces
+            trace = [''] * num_traces
+            for i in range(num_traces):
+                trace[i] = deletionChannel(label,delta)
+            
+            #fragmented
+            fragtrace = [''] * num_traces
+            
+            fraglabel = cut_data(label,fragnum,overlap)
+            for i in range(num_traces):
+                fragtrace[i] = cut_data(trace[i],fragnum,overlap)
+            
+
+            #generate intact 'file' (really just a string)
+            
+            if not '' in trace:
+                label = formater(label)
+                val_label = val_label + '\n' + label
+                for i in range(num_traces):
+                    trace[i] = formater(trace[i])                
+                    val_trace[i] = val_trace[i] + '\n' + trace[i]
+            
+            keep = True
+            #generate a list with all the fragments
+            if not '' in trace:
+                #keep = False
+                for x in range(len(fragtrace)):
+                    if  '' in fragtrace[x] :
+                        keep = False
+                    
+            
+            if keep:
+                
+                for i in range(fragnum):
+                        frag_val_label = frag_val_label + '\n' + formater(fraglabel[i])
+                        for j in range(num_traces):
+                            frag_val_trace[j] = frag_val_trace[j] + '\n' + formater(fragtrace[j][i])
+
+
+    ####TEST
+    for pieceCount in range(pieceNum):
+        seqLength = start_len + (pieceCount * step)
+        for i in range(test_numSeq):
+            #intact
+            label = randomSequence(seqLength,alphabet_size)
+            #generate a list of traces
+            trace = [''] * num_traces
+            for i in range(num_traces):
+                trace[i] = deletionChannel(label,delta)
+            
+            #fragmented
+            fragtrace = [''] * num_traces
+            
+            fraglabel = cut_data(label,fragnum,overlap)
+            for i in range(num_traces):
+                fragtrace[i] = cut_data(trace[i],fragnum,overlap)
+
+            
+            #generate intact 'file' (really just a string)
+            
+            if not '' in trace:
+                label = formater(label)
+                test_label = test_label + '\n' + label
+                for i in range(num_traces):
+                    trace[i] = formater(trace[i])                
+                    test_trace[i] = test_trace[i] + '\n' + trace[i]
+            
+            
+            keep = True
+            #generate a list with all the fragments
+            if not '' in trace:
+                #keep = False
+                for x in range(len(fragtrace)):
+                    if  '' in fragtrace[x] :
+                        keep = False
+            
+            if keep:
+                
+                for i in range(fragnum):
+                        frag_test_label = frag_test_label + '\n' + formater(fraglabel[i])
+                        for j in range(num_traces):
+                            frag_test_trace[j] = frag_test_trace[j] + '\n' + formater(fragtrace[j][i])
+            
+            
+            
+    #delete first line
+    
+    for i in range(num_traces):
+        train_trace[i] = train_trace[i].split("\n",1)[1] + '\n'
+        frag_train_trace[i] = frag_train_trace[i].split("\n",1)[1] + '\n'
+        frag_val_trace[i] = frag_val_trace[i].split("\n",1)[1] + '\n'
+        val_trace[i] = val_trace[i].split("\n",1)[1] + '\n'
+        frag_test_trace[i] = frag_test_trace[i].split("\n",1)[1] + '\n'
+        test_trace[i] = test_trace[i].split("\n",1)[1] + '\n'
+    
+    train_label = train_label.split("\n",1)[1] + '\n'
+    val_label = val_label.split("\n",1)[1] + '\n'
+    test_label = test_label.split("\n",1)[1] + '\n'
+    
+    frag_train_label = frag_train_label.split("\n",1)[1] + '\n'
+    frag_val_label = frag_val_label.split("\n",1)[1] + '\n'
+    frag_test_label = frag_test_label.split("\n",1)[1] + '\n'
+    
+    
+        
+    return (train_label, train_trace, val_label, val_trace, test_label, test_trace, frag_train_label ,frag_train_trace,
+        frag_val_label ,frag_val_trace ,frag_test_label, frag_test_trace  )
 
 def create_files(out_dir,num_traces,fragnum):
     """
@@ -340,8 +540,6 @@ def create_files(out_dir,num_traces,fragnum):
             name = dirpath + "test.trace" + str(i)
             f_test_trace[i] = open(name ,"w+")
     
-
-
     #Fragmented
     #LABELS
     f_frag_train_label = open(dirpath + 'frag_train.label', "w+")
@@ -431,6 +629,7 @@ def create_vocab(args):
 #at the end
 args = parse_arguments()
 
+#previous args
 outdir = args.outdir
 seqLength = args.seqLength
 alphabet_size = args.alphabet_size
@@ -442,10 +641,25 @@ val_size = args.val_size
 fragnum =args.fragnum
 overlap = args.overlap
 
+#ranged args
+ranged_mode = args.ranged_mode
+start_len = args.start_len
+end_len = args.end_len
+step = args.step
+
+
 #cuts
-(train_label, train_trace, val_label, val_trace, test_label, test_trace, frag_train_label ,
- frag_train_trace, frag_val_label ,frag_val_trace ,
- frag_test_label, frag_test_trace ) = generate_cut_strings(seqLength,alphabet_size,delta,numSeq,num_traces,train_size,val_size,fragnum,overlap)
+if not ranged_mode:
+    (train_label, train_trace, val_label, val_trace, test_label, test_trace, frag_train_label ,
+    frag_train_trace, frag_val_label ,frag_val_trace ,
+    frag_test_label, frag_test_trace ) = generate_cut_strings(seqLength,alphabet_size,delta,numSeq,num_traces,train_size,val_size,fragnum,overlap)
+else:
+    (train_label, train_trace, val_label, val_trace, test_label, test_trace, frag_train_label ,
+    frag_train_trace, frag_val_label ,frag_val_trace ,
+    frag_test_label, frag_test_trace ) = generate_cut_strings_ranged(args)
+
+
+
 
 #create files
 (f_train_label, f_train_trace, f_val_label, f_val_trace, f_test_label, f_test_trace, 
