@@ -120,7 +120,20 @@ Returns:
  frag_train_trace, frag_val_label ,frag_val_trace ,frag_test_label, frag_test_trace )
 
 """
-def generate_cut_strings(seqLength,alphabet_size,delta,numSeq,num_traces,train_size,val_size,fragnum,overlap):
+def generate_cut_strings(args):
+    
+    #previous args
+    seqLength = args.seqLength
+    alphabet_size = args.alphabet_size
+    delta = args.delta
+    numSeq = args.numSeq
+    num_traces = args.num_traces
+    train_size = args.train_size
+    val_size = args.val_size
+    fragnum =args.fragnum
+    overlap = args.overlap
+    
+    
     #time to generalize this baby
     train_label = ''
     train_trace = [''] * num_traces
@@ -628,28 +641,29 @@ args = parse_arguments()
 
 #previous args
 outdir = args.outdir
-seqLength = args.seqLength
-alphabet_size = args.alphabet_size
-delta = args.delta
-numSeq = args.numSeq
+#seqLength = args.seqLength
+#alphabet_size = args.alphabet_size
+#delta = args.delta
+#numSeq = args.numSeq
 num_traces = args.num_traces
-train_size = args.train_size
-val_size = args.val_size
+#train_size = args.train_size
+#val_size = args.val_size
 fragnum =args.fragnum
-overlap = args.overlap
+#overlap = args.overlap
 
 #ranged args
+
 ranged_mode = args.ranged_mode
-start_len = args.start_len
-end_len = args.end_len
-step = args.step
+#start_len = args.start_len
+#end_len = args.end_len
+#step = args.step
 
 
 #cuts
 if not ranged_mode:
     (train_label, train_trace, val_label, val_trace, test_label, test_trace, frag_train_label ,
     frag_train_trace, frag_val_label ,frag_val_trace ,
-    frag_test_label, frag_test_trace ) = generate_cut_strings(seqLength,alphabet_size,delta,numSeq,num_traces,train_size,val_size,fragnum,overlap)
+    frag_test_label, frag_test_trace ) = generate_cut_strings(args)
 else:
     (train_label, train_trace, val_label, val_trace, test_label, test_trace, frag_train_label ,
     frag_train_trace, frag_val_label ,frag_val_trace ,
