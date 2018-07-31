@@ -4,7 +4,7 @@
 #outputs a report on the data set
 
 """
-args: out_dir
+args: outdir
 args: seqlenght, alphabet, delta, 
     size, train_split, val_split , fragnum, overlap
 #arguments for the ranged version
@@ -29,12 +29,12 @@ def parse_arguments():
     #initialize the parser
     parser = argparse.ArgumentParser()
     #acces by args.name
-    parser.add_argument('--out_dir',dest="outdir",help='output directory(str)', type=str,default='newdata')
+    parser.add_argument('--outdir',dest="outdir",help='output directory(str)', type=str,default='newdata')
     parser.add_argument('--seqLength',dest="seqLength",help='length of original sequence(int)',type=int,default=100)
     parser.add_argument("--alphabetSize",dest="alphabet_size" ,help="alphabet size (int)",type=int,default=2)
     parser.add_argument('--delta',dest="delta",help='deletion probability (float)',type=float,default=0)
     parser.add_argument('--numSeq',dest="numSeq",help='number of original sequences (int)',type=int,default=100)
-    parser.add_argument('--numTraces',dest="num_traces",help='number of traces per sequence (int)',type=int,default=1)
+    parser.add_argument('--num_traces',dest="num_traces",help='number of traces per sequence (int)',type=int,default=1)
     parser.add_argument('--train_size',dest="train_size",help='percentage of numSeq in the training set as 0.x (float)',type=float,default=0.6)
     parser.add_argument('--val_size',dest="val_size",help='percentage of numSeq in the validation set as 0.x (float)',type=float,default=0.2)
     parser.add_argument('--fragnum',dest="fragnum",help='Number of fragments per sequence (int)',type=int,default=5)
@@ -511,16 +511,17 @@ def create_files(out_dir,num_traces,fragnum):
 
     """
     #find dir
-    current = os.getcwd()
-    path = current + '/' +out_dir
+    #current = os.getcwd()
+    #path = current + '/' +out_dir
+    path=out_dir
     try:  
         os.mkdir(path)
     except OSError:  
         print("Creation of the directory %s failed" % path)
     else:  
         print("Successfully created the directory %s " % path)
-    dirpath = path + '/'
-
+    #dirpath = path + '/'
+    dirpath= out_dir + '/'
 
     #Basic files
     #LABELS
@@ -605,9 +606,10 @@ def create_summary(args):
     summary = summary + '\nNumber of fragments = '+str(fragnum)
     summary = summary + '\nOverlap rate = ' +str(overlap * 100) + '%'
 
-    current = os.getcwd()
-    name = current + '/' +outdir + '/' +'summary.txt'
+    #current = os.getcwd()
+    #name = current + '/' +outdir + '/' +'summary.txt'
 
+    name = outdir + '/summary.txt'
     summary_file = open(name,"w+")
     summary_file.write(summary)
     summary_file.close()
@@ -620,10 +622,12 @@ def create_vocab(args):
     for i in range(alphabet_size):
         base = base + '\n' + str(i)
     
-    current = os.getcwd()
+    #current = os.getcwd()
     
-    label = current + '/' + outdir + '/' + 'vocab.label'
-    trace = current + '/' +outdir + '/' +'vocab.trace'
+    #label = current + '/' + outdir + '/' + 'vocab.label'
+    #trace = current + '/' +outdir + '/' +'vocab.trace'
+    label = outdir + '/vocab.label'
+    trace = outdir + '/vocab.trace'
     label_file = open(label,"w+")
     trace_file = open(trace,"w+") 
     label_file.write(base)

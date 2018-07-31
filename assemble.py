@@ -34,7 +34,7 @@ def parse_arguments():
     #parser.add_argument("name", help="any help", type=str)
     #acces by args.name
     parser.add_argument('--outdir',dest="outdir",help='output directory', type=str,default='newdata')
-    parser.add_argument('--f_inference',dest="f_in",help='inference input file location',type=str,default='test_output.txt')
+    parser.add_argument('--f_inference',dest="f_in",help='inference input file location (Full path)',type=str,default='test_output.txt')
     parser.add_argument('--fragnum',dest="fragnum",help='number of fragments as int',type=int,default=1)
     parser.add_argument('--mode',dest="mode",help='hamming | edit | both (default)', type=str, default='both' )
     parser.add_argument('--bias',dest="bias",help='sin (def) | log',type=str,default='sin')
@@ -43,8 +43,9 @@ def parse_arguments():
 
 def create_file(outdir,mode,bias):
     
-    current = os.getcwd()
-    path = current + '/' + outdir
+    #current = os.getcwd()
+    #path = current + '/' + outdir
+    path = outdir
     if not os.path.isdir(path):
         os.mkdir(path)
         print('Created Directory: ' + outdir)
@@ -66,10 +67,10 @@ def formatter(list_in):
 def inference_list(f_in,fragnum):
     #read lines in a lsit
     #split the list according to fragnum (list of list)
-    current = os.getcwd()
-    inference_file = open(current + '/' + f_in,'r')
+    #current = os.getcwd()
+    inference_file = open(f_in,'r')
     lines = inference_file.readlines()
-
+    
     inf_list = []
     seqnum = int(len(lines) / fragnum)
     #should be a perfect multiple of fragments so no problem here 
@@ -199,6 +200,14 @@ if mode=='both':
     f_out1.close()
     f_out2.close()
 
+else:
+    f_out = create_file(outdir,mode,bias)
+    if mode=='hamming':
+        reconstruct = reconstruct1(inf_list,seqnum,bias)
+    elif mode=='edit':
+        recpnstruct = reconstruct2(inf_list,seqnum,bias)
+    f_out.write(reconstruct)
+    f_out.close()
 
 
 

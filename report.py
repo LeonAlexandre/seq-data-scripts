@@ -37,8 +37,8 @@ def parse_arguments():
 def read_list(input_file):
     #read lines in a list
     #split the list according to fragnum (list of list)
-    current = os.getcwd()
-    inference_file = open(current + '/' + input_file,'r')
+    #current = os.getcwd()
+    inference_file = open(input_file,'r')
     lines = inference_file.readlines()
     seqnum = len(lines)
 
@@ -62,8 +62,8 @@ def create_summary(avg,seqnum,outdir,mode,bias):
     summary = summary + '\nNumber of sequences =   ' + str(seqnum)
     summary = summary + '\nMode = ' + mode
     
-    current = os.getcwd()
-    name = current + '/' + outdir + '/' +'Inference_Summary_' + mode + '_' + bias + '.txt'
+    #current = os.getcwd()
+    name = outdir + '/' +'Inference_Summary_' + mode + '_' + bias + '.txt'
 
     summary_file = open(name,"w+")
     summary_file.write(summary)
