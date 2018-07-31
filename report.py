@@ -30,6 +30,7 @@ def parse_arguments():
     parser.add_argument('--assembled',dest="assembled",help='assembled output',type=str,default='please_specify_file.txt')
     parser.add_argument('--labels',dest="labels",help='labels output',type=str,default='please_specify_labels.txt')
     parser.add_argument('--mode',dest='mode',help='hamming | edit',type=str,default='hamming')
+    parser.add_argument('--bias',dest='bias',help='log | sin (def)',type=str,default='sin')
 
     return parser.parse_args()
 
@@ -54,7 +55,7 @@ def avg_edit(assembled_f,labels_f,seqnum):
     avg = float(avg/seqnum)
     return avg
 
-def create_summary(avg,seqnum,outdir,mode):
+def create_summary(avg,seqnum,outdir,mode,bias):
     
     summary = 'Dataset Report' 
     summary = summary + '\nAverage edit distance = ' + str(avg)
@@ -62,7 +63,7 @@ def create_summary(avg,seqnum,outdir,mode):
     summary = summary + '\nMode = ' + mode
     
     current = os.getcwd()
-    name = current + '/' + outdir + '/' +'Inference_Summary_' + mode +'.txt'
+    name = current + '/' + outdir + '/' +'Inference_Summary_' + mode + '_' + bias + '.txt'
 
     summary_file = open(name,"w+")
     summary_file.write(summary)
@@ -75,6 +76,7 @@ outdir = args.outdir
 assembled = args.assembled
 labels = args.labels
 mode = args.mode
+bias = args.bias
 
 assembled_f, seqnum1 = read_list(assembled)
 labels_f, seqnum2 = read_list(labels)
@@ -88,4 +90,4 @@ avg = avg_edit(assembled_f,labels_f,seqnum1)
 
 print(avg)
 
-create_summary(avg,seqnum1,outdir,mode)
+create_summary(avg,seqnum1,outdir,mode,bias)

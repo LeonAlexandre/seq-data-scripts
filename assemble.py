@@ -36,11 +36,12 @@ def parse_arguments():
     parser.add_argument('--outdir',dest="outdir",help='output directory', type=str,default='newdata')
     parser.add_argument('--f_inference',dest="f_in",help='inference input file location',type=str,default='test_output.txt')
     parser.add_argument('--fragnum',dest="fragnum",help='number of fragments as int',type=int,default=1)
-    parser.add_argument('--mode',dest="mode",help='hamming | edit | both', type=str, default='both' )
+    parser.add_argument('--mode',dest="mode",help='hamming | edit | both (default)', type=str, default='both' )
+    parser.add_argument('--bias',dest="bias",help='sin (def) | log',type=str,default='sin')
 
     return parser.parse_args()
 
-def create_file(outdir,mode):
+def create_file(outdir,mode,bias):
     
     current = os.getcwd()
     path = current + '/' + outdir
@@ -50,7 +51,7 @@ def create_file(outdir,mode):
     else:
         print('Directory ' + outdir + ' already exists!')
 
-    f_out = open(path + '/recons_' + mode + '.txt', "w+")
+    f_out = open(path + '/recons_' + mode + '_' +bias + '.txt', "w+")
 
     return f_out
 
@@ -83,11 +84,8 @@ def inference_list(f_in,fragnum):
     return inf_list, seqnum
 
 #hamming score
-def assembler_ham(fraglist,fragnum):
+def assembler_ham(fraglist,fragnum,bias):
 
-
-    #score_bias = 0.5
-    
 
     u = np.asarray(fraglist[ 0 ])
     window = int(math.ceil(len(u) * 0.5))
@@ -100,9 +98,13 @@ def assembler_ham(fraglist,fragnum):
         for j in range(window)[1:] :
             w = u[-j:].astype(int)
             x = v[:j].astype(int)
-            #score = (1 - float(sum( (w + x) %2) )/ i) * float(i * score_bias)
-            score = (1 - float(sum( (w + x) %2) )/ j)  * math.sin((j * math.pi)/(window - 1))
-            #score = (1 - float(sum( (w + x) %2) )/ j)  * math.sin((j * math.pi)/(window ))
+            
+            if bias=='sin':
+                score_bias = math.sin((j * math.pi)/(window - 1))
+            elif bias=='log': #log-bias
+                score_bias = math.log(j + 1)/(math.log(window))
+            
+            score = (1 - float(sum( (w + x) %2) )/ j)  * score_bias
             
             sumlist.append(score)
 
@@ -115,10 +117,10 @@ def assembler_ham(fraglist,fragnum):
     return  d
 
 #hamming score
-def reconstruct1(inf_list,seqnum):
+def reconstruct1(inf_list,seqnum,bias):
     reconstructed = ''
     for i in range(seqnum):
-        reconstructed = reconstructed + "\n" + formatter(assembler_ham(inf_list[i],fragnum))
+        reconstructed = reconstructed + "\n" + formatter(assembler_ham(inf_list[i],fragnum,bias))
     #delete frist line
     reconstructed = reconstructed.split("\n",1)[1]
 
@@ -126,7 +128,7 @@ def reconstruct1(inf_list,seqnum):
 
 
 #edit score
-def assembler_edit(fraglist,fragnum):
+def assembler_edit(fraglist,fragnum,bias):
 
     u = np.asarray(fraglist[ 0 ])
     window = int(math.ceil(len(u) * 0.5))
@@ -144,9 +146,12 @@ def assembler_edit(fraglist,fragnum):
             str1 = ''.join(array1.tolist())
             str2 = ''.join(array2.tolist())
 
-
-            bias = math.sin((j * math.pi)/(window - 1))
-            score = (1 - float(lv.distance(str1,str2) / j))  * bias
+            if bias=='sin':
+                score_bias = math.sin((j * math.pi)/(window - 1))
+            elif bias=='log': #log-bias
+                score_bias = math.log(j + 1)/(math.log(window))
+            
+            score = (1 - float(lv.distance(str1,str2) / j))  * score_bias
             
             sumlist.append(score)
 
@@ -158,10 +163,10 @@ def assembler_edit(fraglist,fragnum):
     return  d
 
 #edit score
-def reconstruct2(inf_list,seqnum):
+def reconstruct2(inf_list,seqnum,bias):
     reconstructed = ''
     for i in range(seqnum):
-        reconstructed = reconstructed + "\n" + formatter(assembler_edit(inf_list[i],fragnum))
+        reconstructed = reconstructed + "\n" + formatter(assembler_edit(inf_list[i],fragnum,bias))
     #delete frist line
     reconstructed = reconstructed.split("\n",1)[1]
 
@@ -175,6 +180,7 @@ outdir = args.outdir
 f_in = args.f_in
 fragnum = args.fragnum
 mode = args.mode
+bias = args.bias
 
 #process input
 
@@ -184,10 +190,10 @@ inf_list, seqnum = inference_list(f_in,fragnum)
 
 
 if mode=='both':
-    f_out1 = create_file(outdir,'hamming')
-    reconstructed1 = reconstruct1(inf_list,seqnum)
-    reconstructed2 = reconstruct2(inf_list,seqnum)
-    f_out2 = create_file(outdir,'edit')
+    f_out1 = create_file(outdir,'hamming',bias)
+    reconstructed1 = reconstruct1(inf_list,seqnum,bias)
+    reconstructed2 = reconstruct2(inf_list,seqnum,bias)
+    f_out2 = create_file(outdir,'edit',bias)
     f_out1.write(reconstructed1)
     f_out2.write(reconstructed2)
     f_out1.close()
