@@ -513,8 +513,6 @@ def create_files(out_dir,num_traces,fragnum):
     #find dir
     current = os.getcwd()
     path = current + '/' +out_dir
-    print(current)
-    print(path)
     try:  
         os.mkdir(path)
     except OSError:  
