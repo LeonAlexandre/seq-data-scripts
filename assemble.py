@@ -37,7 +37,7 @@ def parse_arguments():
     parser.add_argument('--f_inference',dest="f_in",help='inference input file location (Full path)',type=str,default='test_output.txt')
     parser.add_argument('--fragnum',dest="fragnum",help='number of fragments as int',type=int,default=1)
     parser.add_argument('--mode',dest="mode",help='hamming | edit | both (default)', type=str, default='both' )
-    parser.add_argument('--bias',dest="bias",help='sin (def) | log',type=str,default='sin')
+    parser.add_argument('--bias',dest="bias",help='sin (def) | log | logsin',type=str,default='sin')
 
     return parser.parse_args()
 
@@ -104,6 +104,8 @@ def assembler_ham(fraglist,fragnum,bias):
                 score_bias = math.sin((j * math.pi)/(window - 1))
             elif bias=='log': #log-bias
                 score_bias = math.log(j + 1)/(math.log(window))
+            elif bias=='logsin':
+                score_bias = (math.sin((j * math.pi)/(window - 1)) + math.log(j + 1)/(math.log(window))) / 1.75
             
             score = (1 - float(sum( (w + x) %2) )/ j)  * score_bias
             
@@ -151,6 +153,8 @@ def assembler_edit(fraglist,fragnum,bias):
                 score_bias = math.sin((j * math.pi)/(window - 1))
             elif bias=='log': #log-bias
                 score_bias = math.log(j + 1)/(math.log(window))
+            elif bias=='logsin':
+                score_bias = (math.sin((j * math.pi)/(window - 1)) + math.log(j + 1)/(math.log(window))) / 1.75
             
             score = (1 - float(lv.distance(str1,str2) / j))  * score_bias
             
