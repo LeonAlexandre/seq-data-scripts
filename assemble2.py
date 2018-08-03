@@ -37,7 +37,7 @@ def parse_arguments():
     parser.add_argument('--f_inference',dest="f_in",help='inference input file location (Full path)',type=str,default='test_output.txt')
     parser.add_argument('--fragnum',dest="fragnum",help='number of fragments as int',type=int,default=1)
     parser.add_argument('--mode',dest="mode",help='hamming | edit | both (default)', type=str, default='both' )
-    parser.add_argument('--bias',dest="bias",help='sin (def) | log | logsin',type=str,default='sin')
+    parser.add_argument('--bias',dest="bias",help='sin (def) | log | logsin | sigmoid',type=str,default='sin')
 
     return parser.parse_args()
 
@@ -106,16 +106,22 @@ def assembler_ham(fraglist,fragnum,bias):
                 score_bias = math.log(j + 1)/(math.log(window))
             elif bias=='logsin':
                 score_bias = (math.sin((j * math.pi)/(window - 1)) + math.log(j + 1)/(math.log(window))) / 1.75
+            elif bias=='sigmoid':
+                score_bias=(1/(1 + math.exp(-j / (window/4.0))) - 0.55) * 2.0
+                
+            elif bias=='tanh':
+                score_bias= math.tanh(j/ (window *0.5))
+
             
             score = (1 - float(sum( (w + x) %2) )/ j)  * score_bias
             
             sumlist.append(score)
 
-                    
         max_portion = sumlist.index(max(sumlist))
         v2 = v[max_portion + 1 :]
         d = np.concatenate((u,v2))
         u = np.copy(d)
+        
     
     return  d
 
@@ -155,6 +161,10 @@ def assembler_edit(fraglist,fragnum,bias):
                 score_bias = math.log(j + 1)/(math.log(window))
             elif bias=='logsin':
                 score_bias = (math.sin((j * math.pi)/(window - 1)) + math.log(j + 1)/(math.log(window))) / 1.75
+            elif bias=='sigmoid':
+                score_bias=(1/(1 + math.exp(-j / (window/4.0))) - 0.55) * 2.0
+            elif bias=='tanh':
+                score_bias= math.tanh(j/ (window *0.5))
             
             score = (1 - float(lv.distance(str1,str2) / j))  * score_bias
             
@@ -164,6 +174,7 @@ def assembler_edit(fraglist,fragnum,bias):
         v2 = v[max_portion + 1 :]
         d = np.concatenate((u,v2))
         u = np.copy(d)
+
     
     return  d
 
