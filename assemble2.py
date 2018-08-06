@@ -89,7 +89,7 @@ def assembler_ham(fraglist,fragnum,bias):
 
 
     u = np.asarray(fraglist[ 0 ])
-    window = int(math.ceil(len(u) * 0.5))
+    window = int(math.ceil(len(u) / 3.0))
     for i in range(fragnum - 1):
         sumlist = []
         
@@ -140,7 +140,7 @@ def reconstruct1(inf_list,seqnum,bias):
 def assembler_edit(fraglist,fragnum,bias):
 
     u = np.asarray(fraglist[ 0 ])
-    window = int(math.ceil(len(u) * 0.5))
+    window = int(math.ceil(len(u) / 3.0))
     for i in range(fragnum - 1):
         sumlist = []
         

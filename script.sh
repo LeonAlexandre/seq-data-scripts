@@ -2,7 +2,7 @@
 
 #make it a while loop
 
-foo='/Users/alex/Desktop/seq100by20_01_biadam_bahdanau'
+foo='/Users/alex/Desktop/seq2t100by20_01_biadam'
 
 echo $foo; 
 
