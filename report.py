@@ -47,7 +47,9 @@ def read_list(input_file):
 def avg_edit(assembled_f,labels_f,seqnum):
     avg = 0.0
     assembled_f = [x.replace(' ','') for x in assembled_f]
+    #removes interstitial spaces
     labels_f = [x.replace(' ','') for x in labels_f]
+
     
     for i in range(seqnum):
         seqLength = len(labels_f[i]) 
@@ -55,12 +57,31 @@ def avg_edit(assembled_f,labels_f,seqnum):
     avg = float(avg/seqnum)
     return avg
 
-def create_summary(avg,seqnum,outdir,mode,bias):
+def diagnose(assembled_f,labels_f,seqnum):
+    editAvg = 0.0
+    lengthAvg = 0.0
+
+    assembled_f = [x.replace(' ','') for x in assembled_f]
+    #removes interstitial spaces
+    labels_f = [x.replace(' ','') for x in labels_f]
+
+    
+    for i in range(seqnum):
+        seqLength = len(labels_f[i])
+        traceLength = len(assembled_f[i])
+        lengthAvg += abs(seqLength - traceLength) 
+        editAvg = editAvg + float(lv.distance(assembled_f[i],labels_f[i]) / seqLength)
+    editAvg = float(editAvg/seqnum)
+    lengthAvg = float(lengthAvg)/seqnum
+    return editAvg, lengthAvg
+
+def create_summary(editAvg,lengthAvg,seqnum,outdir,mode,bias):
     
     summary = 'Dataset Report' 
-    summary = summary + '\nAverage edit distance = ' + str(avg)
-    summary = summary + '\nNumber of sequences =   ' + str(seqnum)
-    summary = summary + '\nMode = ' + mode
+    summary += '\nNumber of sequences =   ' + str(seqnum)
+    summary += '\nAverage edit distance = ' + str(editAvg)
+    summary += '\nAverage length mismatch = ' + str(lengthAvg)
+    summary += '\nMode = ' + mode
     
     #current = os.getcwd()
     name = outdir + '/' +'Inference_Summary_' + mode + '_' + bias + '.txt'
@@ -86,8 +107,9 @@ if not seqnum1==seqnum2:
 else:
     print("Number of sequences " + str(seqnum1))
 
-avg = avg_edit(assembled_f,labels_f,seqnum1)
+editAvg, lengthAvg = diagnose(assembled_f,labels_f,seqnum1)
 
-print(avg)
+print('edit:' + str(editAvg))
+print('length diff:' + str(lengthAvg))
 
-create_summary(avg,seqnum1,outdir,mode,bias)
+create_summary(editAvg, lengthAvg, seqnum1, outdir, mode, bias)
