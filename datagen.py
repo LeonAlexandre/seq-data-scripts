@@ -87,15 +87,23 @@ def formater(list_in):
 #def cut_data(label,trace,fragnum,overlap):
 
 def cut_data(label,fragnum,overlap):
-    portion = int(math.floor(len(label) / fragnum))
+    portion = int(round(len(label) / float(fragnum)))
     ov = int(math.ceil(portion * overlap))
     
     fraglabel = []
     fraglabel.append(label[0:portion + ov])
     
+    """
     for i in range(fragnum)[1: fragnum - 1]:
         fraglabel.append(label[(i * portion) - ov: ((i+1) * portion) + ov])
-    fraglabel.append(label[(fragnum -1) * portion :])
+    fraglabel.append(label[(fragnum ) * portion :])
+    """
+    for i in range(fragnum)[1: fragnum - 1]:
+        fraglabel.append(label[(i * portion) - ov : ((i+1) * portion) + ov])
+    #fraglabel.append(label[((fragnum - 1) * portion )- ov:])
+    fraglabel.append(label[ - portion:])
+
+
     #alt
     #fraglabel.append(label[(fragnum -1) * portion - ov:])
         
@@ -190,7 +198,7 @@ def generate_cut_strings(args):
         if keep:
             
             for i in range(fragnum):
-                    frag_train_label = frag_train_label + '\n' + formater(fraglabel[i])
+                    frag_train_label += '\n' + formater(fraglabel[i])
                     for j in range(num_traces):
                         frag_train_trace[j] = frag_train_trace[j] + '\n' + formater(fragtrace[j][i])
           
@@ -237,7 +245,7 @@ def generate_cut_strings(args):
                     for j in range(num_traces):
                         frag_val_trace[j] = frag_val_trace[j] + '\n' + formater(fragtrace[j][i])
 
-
+    
     ####TEST   
     for i in range(int(numSeq*(1 - val_size - train_size))):
         #intact
