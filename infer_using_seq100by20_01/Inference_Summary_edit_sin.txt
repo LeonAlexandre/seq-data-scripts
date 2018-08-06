@@ -1,4 +1,0 @@
-Dataset Report
-Average edit distance = 0.15307492507492437
-Number of sequences =   1000
-Mode = edit
