@@ -70,7 +70,7 @@ def diagnose(assembled_f,labels_f,seqnum):
         seqLength = len(labels_f[i])
         traceLength = len(assembled_f[i])
         lengthAvg += abs(seqLength - traceLength) 
-        editAvg = editAvg + float(lv.distance(assembled_f[i],labels_f[i]) / seqLength)
+        editAvg += float(lv.distance(assembled_f[i],labels_f[i]) / seqLength)
     editAvg = float(editAvg/seqnum)
     lengthAvg = float(lengthAvg)/seqnum
     return editAvg, lengthAvg
