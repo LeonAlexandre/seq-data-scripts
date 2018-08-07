@@ -94,8 +94,9 @@ def cut_data(label,fragnum,overlap):
     fraglabel.append(label[0:portion + ov])
     
     for i in range(fragnum)[1: fragnum - 1]:
-        fraglabel.append(label[(i * portion) - ov: ((i+1) * portion) + ov])
-    fraglabel.append(label[(fragnum -1) * portion :])
+        fraglabel.append(label[(i * portion) - ov : ((i+1) * portion) + ov])
+    #fraglabel.append(label[((fragnum - 1) * portion )- ov:])
+    fraglabel.append(label[ - portion:])
     #alt
     #fraglabel.append(label[(fragnum -1) * portion - ov:])
         
