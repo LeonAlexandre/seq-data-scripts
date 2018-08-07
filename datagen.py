@@ -38,7 +38,7 @@ def parse_arguments():
     parser.add_argument('--train_size',dest="train_size",help='percentage of numSeq in the training set as 0.x (float)',type=float,default=0.6)
     parser.add_argument('--val_size',dest="val_size",help='percentage of numSeq in the validation set as 0.x (float)',type=float,default=0.2)
     parser.add_argument('--fragnum',dest="fragnum",help='Number of fragments per sequence (int)',type=int,default=5)
-    parser.add_argument('--overlap',dest="overlap",help='overlap rate of the fragments as 0.x (int)',type=float,default=0.1)
+    parser.add_argument('--overlap',dest="overlap",help='overlap rate of the fragments as 0.x (float)',type=float,default=0.1)
     parser.add_argument('--ranged_mode',dest="ranged_mode",help='Enables ranged mode (bool)',type=bool,default=False)
     parser.add_argument('--start_len',dest="start_len",help='starting length (int)',type=int,default=100)
     parser.add_argument('--end_len',dest="end_len",help='ending length(int)',type=int,default=100)
