@@ -109,7 +109,6 @@ def inference_list(prefix, suffix,indir):
     
     filename = indir + '/' + prefix+'.'+suffix
     inference_file = open(filename,'r')
-    print('found file: ',filename)
     lines = inference_file.readlines()
     
     inf_list = []
@@ -135,7 +134,6 @@ def cut_list(in_list,fragnum,overlap):
     
     ####cutting      
     for i in range(len(in_list)):
-        print(i)
         fragment_list = cut_data(in_list[i],fragnum,overlap)
         
         if not '' in fragment_list: #guards against empty fragments
@@ -186,7 +184,6 @@ in_val_trace = inference_list('val', suffix, indir)
 in_test_trace = inference_list('test', suffix, indir)
 
 
-print('cutting data')
 
 #cut data
 frag_train_label = cut_list(in_train_label, fragnum, overlap)
@@ -196,7 +193,6 @@ frag_val_trace = cut_list(in_val_trace , fragnum, overlap)
 frag_test_label = cut_list(in_test_label, fragnum, overlap)
 frag_test_trace = cut_list(in_test_trace, fragnum, overlap)
 
-print('creating files')
 #create files
 (f_frag_train_label , f_frag_train_trace, f_frag_val_label ,
 f_frag_val_trace ,f_frag_test_label, f_frag_test_trace ) = create_files(outdir,num_traces,fragnum)
@@ -204,12 +200,10 @@ f_frag_val_trace ,f_frag_test_label, f_frag_test_trace ) = create_files(outdir,n
 
 #write to file
 
-print('writing to file')
 f_frag_train_label.write(frag_train_label)
 f_frag_val_label.write(frag_val_label)
 f_frag_test_label.write(frag_test_label)
 
-print(frag_val_trace)
 
 if num_traces == 1:
     f_frag_train_trace[0].write(frag_train_trace)
