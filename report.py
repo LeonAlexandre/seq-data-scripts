@@ -29,6 +29,7 @@ def parse_arguments():
     parser.add_argument("--outdir",dest="outdir",help='output directory', type=str,default='newdata')
     parser.add_argument('--assembled',dest="assembled",help='assembled output',type=str,default='please_specify_file.txt')
     parser.add_argument('--labels',dest="labels",help='labels output',type=str,default='please_specify_labels.txt')
+    parser.add_argument("--trace",dest="trace",help="trace file to calculate delta",type=str,default=None)
     parser.add_argument('--mode',dest='mode',help='hamming | edit',type=str,default='hamming')
     parser.add_argument('--bias',dest='bias',help='log | sin (def) | logsin',type=str,default='sin')
 
@@ -37,7 +38,8 @@ def parse_arguments():
 def read_list(input_file):
     #read lines in a list
     #split the list according to fragnum (list of list)
-    #current = os.getcwd()
+    __location__ = os.getcwd()
+    inference_file = os.path.join(__location__,input_file)
     inference_file = open(input_file,'r')
     lines = inference_file.readlines()
     seqnum = len(lines)
@@ -46,41 +48,60 @@ def read_list(input_file):
 
 def avg_edit(assembled_f,labels_f,seqnum):
     avg = 0.0
-    assembled_f = [x.replace(' ','') for x in assembled_f]
-    #removes interstitial spaces
-    labels_f = [x.replace(' ','') for x in labels_f]
-
-    
-    for i in range(seqnum):
-        seqLength = len(labels_f[i]) 
-        avg = avg + float(lv.distance(assembled_f[i],labels_f[i]) / seqLength)
+    for (ass,lab) in zip(assembled_f,labels_f):
+        avg += lv.distance(ass,lab) / len(lab)
     avg = float(avg/seqnum)
     return avg
 
-def diagnose(assembled_f,labels_f,seqnum):
-    editAvg = 0.0
-    lengthAvg = 0.0
+def avg_delta(assembled_f,trace_f,seqnum):
+    avg = 0.0
+    for (ass,tra) in zip(assembled_f,trace_f):
+        avg += float(len(ass) - len(tra)) / len(ass)
+    avg = avg / seqnum
+    return avg
 
+def avg_len_diff(assembled_f,labels_f,seqnum):
+    avg = 0.0
+    for (ass,lab) in zip(assembled_f,labels_f):
+        avg += abs(len(ass)-len(lab)) / len(lab)
+    avg = avg / seqnum
+    return avg
+
+def avg_hamming(assembled_f,labels_f,seqnum):
+    avg = 0.0
+    for (ass,lab) in zip(assembled_f,labels_f):
+        ass_len = len(ass)
+        lab_len = len(lab)
+        if ass_len > lab_len:
+            ass = ass[:lab_len]
+        if ass_len < lab_len:
+            ass = ass + "1" * (lab_len - ass_len)
+
+        avg += sum(ass_sym != lab_sym for (ass_sym, lab_sym) in zip(ass,lab)) / lab_len
+
+    avg = avg / seqnum
+    return avg
+
+def diagnose(assembled_f,labels_f,trace_f,seqnum):
     assembled_f = [x.replace(' ','') for x in assembled_f]
-    #removes interstitial spaces
     labels_f = [x.replace(' ','') for x in labels_f]
+    trace_f = [x.replace(' ','') for x in trace_f]
 
-    
-    for i in range(seqnum):
-        seqLength = len(labels_f[i])
-        traceLength = len(assembled_f[i])
-        lengthAvg += abs(seqLength - traceLength) 
-        editAvg += float(lv.distance(assembled_f[i],labels_f[i]) / seqLength)
-    editAvg = float(editAvg/seqnum)
-    lengthAvg = float(lengthAvg)/seqnum
-    return editAvg, lengthAvg
+    ed = avg_edit(assembled_f,labels_f,seqnum)
+    hd = avg_hamming(assembled_f,labels_f,seqnum)
+    delta = avg_delta(assembled_f,trace_f,seqnum)
+    len_diff = avg_len_diff(assembled_f,labels_f,seqnum)
 
-def create_summary(editAvg,lengthAvg,seqnum,outdir,mode,bias):
+    return ed, hd, delta, len_diff
+
+def create_summary(editAvg,hammingAvg,deltaAvg,len_diff,seqnum,outdir,mode,bias):
     
     summary = 'Dataset Report' 
     summary += '\nNumber of sequences =   ' + str(seqnum)
-    summary += '\nAverage edit distance = ' + str(editAvg)
-    summary += '\nAverage length mismatch = ' + str(lengthAvg)
+    summary += '\nAverage normalized edit distance = ' + str(editAvg)
+    summary += '\nAverage normalized hamming distance = ' + str(hammingAvg)
+    summary += '\nAverage delta = ' + str(deltaAvg)
+    summary += '\nAverage normalized len diff = ' + str(len_diff)
     summary += '\nMode = ' + mode
     
     #current = os.getcwd()
@@ -96,20 +117,24 @@ args = parse_arguments()
 outdir = args.outdir
 assembled = args.assembled
 labels = args.labels
+trace = args.trace
 mode = args.mode
 bias = args.bias
 
 assembled_f, seqnum1 = read_list(assembled)
 labels_f, seqnum2 = read_list(labels)
+trace_f, _ = read_list(trace)
 
 if not seqnum1==seqnum2:
     print('number of sequences not equal. redo assembly?')
 else:
     print("Number of sequences " + str(seqnum1))
 
-editAvg, lengthAvg = diagnose(assembled_f,labels_f,seqnum1)
+editAvg, hammingAvg, deltaAvg, len_diff = diagnose(assembled_f,labels_f,trace_f,seqnum1)
 
-print('edit:' + str(editAvg))
-print('length diff:' + str(lengthAvg))
+print('ANED: ' + str(editAvg))
+print('ANHD: ' + str(hammingAvg))
+print('delta: ' + str(deltaAvg))
+print("ANLD: " + str(len_diff))
 
-create_summary(editAvg, lengthAvg, seqnum1, outdir, mode, bias)
+create_summary(editAvg, hammingAvg, deltaAvg, len_diff, seqnum1, outdir, mode, bias)

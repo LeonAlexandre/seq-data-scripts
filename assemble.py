@@ -67,7 +67,8 @@ def formatter(list_in):
 def inference_list(f_in,fragnum):
     #read lines in a lsit
     #split the list according to fragnum (list of list)
-    #current = os.getcwd()
+    __location__ = os.getcwd()
+    inference_file = os.path.join(__location__,f_in)
     inference_file = open(f_in,'r')
     lines = inference_file.readlines()
     
