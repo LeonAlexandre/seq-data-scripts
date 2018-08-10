@@ -84,6 +84,7 @@ def inference_list(f_in,fragnum):
 
     return inf_list, seqnum
 
+
 #hamming score
 def assembler_ham(fraglist,fragnum,bias):
 
@@ -113,6 +114,8 @@ def assembler_ham(fraglist,fragnum,bias):
 
                     
         max_portion = sumlist.index(max(sumlist))
+
+
         v2 = v[max_portion + 1 :]
         d = np.concatenate((u,v2))
         u = np.copy(d)
