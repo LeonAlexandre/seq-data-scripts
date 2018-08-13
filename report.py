@@ -53,6 +53,56 @@ def avg_edit(assembled_f,labels_f,seqnum):
     avg = float(avg/seqnum)
     return avg
 
+'''
+def edit2(string1, string2):
+    len1 = len(string1)
+    len2 = len(string2)
+    v = np.zeros([len1+1,len2+1])
+    for i in range(1,len1):
+        v[i,0] = i
+    for j in range(1,len2):
+        v[0,j] = j
+    for i in range(0,len1):
+        for j in range(0,len2):
+            if string1[i] == string2[j]:
+                #v[i+1,j+1] = v[i,j]
+                substitutionCost = 0
+            else:
+                #v[i+1,j+1] = 1 + min(min(v[i+1,j],v[i,j+1]),v[i,j])
+                substitutionCost = 1
+            deletion = v[i,j+1] + 2
+            insertion = v[i+1,j] + 2
+            substitution = v[i,j] + substitutionCost
+            v[i+1,j+1] = min(min(deletion,insertion),substitution)
+    return v[len1,len2]
+'''
+def edit2(s1, s2):
+    if len(s1) < len(s2):
+        return edit2(s2, s1)
+
+    # len(s1) >= len(s2)
+    if len(s2) == 0:
+        return len(s1)
+
+    previous_row = range(len(s2) + 1)
+    for i, c1 in enumerate(s1):
+        current_row = [i + 1]
+        for j, c2 in enumerate(s2):
+            insertions = previous_row[j + 1] + 2 # j+1 instead of j since previous_row and current_row are one character longer
+            deletions = current_row[j] + 2       # than s2
+            substitutions = previous_row[j] + (c1 != c2)
+            current_row.append(min(insertions, deletions, substitutions))
+        previous_row = current_row
+    
+    return previous_row[-1]
+
+def avg_edit2(assembled_f,labels_f,seqnum):
+    avg = 0
+    for (ass,lab) in zip(assembled_f,labels_f):
+        avg += edit2(ass,lab) / len(lab)
+    avg = avg / seqnum
+    return avg
+
 def avg_delta(assembled_f,trace_f,seqnum):
     avg = 0.0
     for (ass,tra) in zip(assembled_f,trace_f):
@@ -88,17 +138,19 @@ def diagnose(assembled_f,labels_f,trace_f,seqnum):
     trace_f = [x.replace(' ','') for x in trace_f]
 
     ed = avg_edit(assembled_f,labels_f,seqnum)
+    ed2 = avg_edit2(assembled_f,labels_f,seqnum)
     hd = avg_hamming(assembled_f,labels_f,seqnum)
     delta = avg_delta(assembled_f,trace_f,seqnum)
     len_diff = avg_len_diff(assembled_f,labels_f,seqnum)
 
-    return ed, hd, delta, len_diff
+    return ed, ed2, hd, delta, len_diff
 
-def create_summary(editAvg,hammingAvg,deltaAvg,len_diff,seqnum,outdir,mode,bias):
+def create_summary(editAvg,editAvg2,hammingAvg,deltaAvg,len_diff,seqnum,outdir,mode,bias):
     
     summary = 'Dataset Report' 
     summary += '\nNumber of sequences =   ' + str(seqnum)
     summary += '\nAverage normalized edit distance = ' + str(editAvg)
+    summary += '\nAverage normalized editdistance 2 = ' + str(editAvg2)
     summary += '\nAverage normalized hamming distance = ' + str(hammingAvg)
     summary += '\nAverage delta = ' + str(deltaAvg)
     summary += '\nAverage normalized len diff = ' + str(len_diff)
@@ -130,11 +182,12 @@ if not seqnum1==seqnum2:
 else:
     print("Number of sequences " + str(seqnum1))
 
-editAvg, hammingAvg, deltaAvg, len_diff = diagnose(assembled_f,labels_f,trace_f,seqnum1)
+editAvg, editAvg2, hammingAvg, deltaAvg, len_diff = diagnose(assembled_f,labels_f,trace_f,seqnum1)
 
 print('ANED: ' + str(editAvg))
+print('ANED2: ' + str(editAvg2))
 print('ANHD: ' + str(hammingAvg))
-print('delta: ' + str(deltaAvg))
 print("ANLD: " + str(len_diff))
+print('delta: ' + str(deltaAvg))
 
-create_summary(editAvg, hammingAvg, deltaAvg, len_diff, seqnum1, outdir, mode, bias)
+create_summary(editAvg, editAvg2, hammingAvg, deltaAvg, len_diff, seqnum1, outdir, mode, bias)
