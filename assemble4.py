@@ -10,6 +10,7 @@ Inference file
 Fragnum
 """
 
+#Uses hamming Superposition
 
 
 
@@ -19,6 +20,8 @@ import math
 import os
 import numpy as np
 import Levenshtein as lv
+
+from scipy.interpolate import interp1d
 
 def parse_arguments():
     """
@@ -38,6 +41,7 @@ def parse_arguments():
     parser.add_argument('--fragnum',dest="fragnum",help='number of fragments as int',type=int,default=1)
     parser.add_argument('--mode',dest="mode",help='hamming | edit | both (default)', type=str, default='both' )
     parser.add_argument('--bias',dest="bias",help='sin (def) | log | logsin',type=str,default='sin')
+
 
     return parser.parse_args()
 
@@ -67,8 +71,7 @@ def formatter(list_in):
 def inference_list(f_in,fragnum):
     #read lines in a lsit
     #split the list according to fragnum (list of list)
-    __location__ = os.getcwd()
-    inference_file = os.path.join(__location__,f_in)
+    #current = os.getcwd()
     inference_file = open(f_in,'r')
     lines = inference_file.readlines()
     
@@ -84,6 +87,53 @@ def inference_list(f_in,fragnum):
 
 
     return inf_list, seqnum
+
+
+def stringify(list_in):
+  #Input:list
+  #ouput: string
+  return(''.join(str(x) for x in list_in))
+
+
+def generateAddArray(arr1, arr2):
+    #generate the addition array
+    u = min(len(arr1),len(arr2))
+    arr1 = arr1[:u].astype(int)
+    arr2 = arr2[:u].astype(int)
+    
+    fin = arr1 + arr2
+    
+    return(fin)
+
+
+
+def hammingSuperposition(fin,x,y):
+    #superposition algorithm
+    betterList = []
+    prev = 0
+
+    for i in range(len(fin)):
+        if fin[i] == 1:
+            if prev == x[i]:
+                betterList.append(x[i])
+                betterList.append(y[i])
+                prev = y[i]
+            elif prev == y[i]:
+                betterList.append(y[i])
+                betterList.append(x[i])
+                prev = x[i]
+            
+        else:
+            
+            if fin[i] == 2:
+                betterList.append(1)
+            if fin[i] == 0:
+                betterList.append(0)
+            prev = fin[i]
+    
+    betterList = np.asarray(betterList).astype(int)
+
+    return betterList
 
 
 #hamming score
@@ -116,9 +166,15 @@ def assembler_ham(fraglist,fragnum,bias):
                     
         max_portion = sumlist.index(max(sumlist))
 
+        x = u[-max_portion:]
+        y = v[:max_portion]
+        fin = generateAddArray(x,y)
+        middle = hammingSuperposition(fin,x,y)
+        u2 = u[:-max_portion]
 
         v2 = v[max_portion + 1 :]
-        d = np.concatenate((u,v2))
+        
+        d = np.concatenate((u2,middle,v2),axis=0)
         u = np.copy(d)
     
     return  d
@@ -165,8 +221,16 @@ def assembler_edit(fraglist,fragnum,bias):
             sumlist.append(score)
 
         max_portion = sumlist.index(max(sumlist))
+
+        x = u[-max_portion:]
+        y = v[:max_portion]
+        fin = generateAddArray(x,y)
+        middle = hammingSuperposition(fin,x,y)
+        u2 = u[:-max_portion]
+
         v2 = v[max_portion + 1 :]
-        d = np.concatenate((u,v2))
+        
+        d = np.concatenate((u2,middle,v2),axis=0)
         u = np.copy(d)
     
     return  d

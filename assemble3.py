@@ -10,6 +10,7 @@ Inference file
 Fragnum
 """
 
+#Uses hamming Interpolation
 
 
 
@@ -19,6 +20,8 @@ import math
 import os
 import numpy as np
 import Levenshtein as lv
+
+from scipy.interpolate import interp1d
 
 def parse_arguments():
     """
@@ -37,7 +40,8 @@ def parse_arguments():
     parser.add_argument('--f_inference',dest="f_in",help='inference input file location (Full path)',type=str,default='test_output.txt')
     parser.add_argument('--fragnum',dest="fragnum",help='number of fragments as int',type=int,default=1)
     parser.add_argument('--mode',dest="mode",help='hamming | edit | both (default)', type=str, default='both' )
-    parser.add_argument('--bias',dest="bias",help='sin (def) | log | logsin | sigmoid',type=str,default='sin')
+    parser.add_argument('--bias',dest="bias",help='sin (def) | log | logsin',type=str,default='sin')
+
 
     return parser.parse_args()
 
@@ -84,12 +88,62 @@ def inference_list(f_in,fragnum):
 
     return inf_list, seqnum
 
+
+def stringify(list_in):
+  #Input:list
+  #ouput: string
+  return(''.join(str(x) for x in list_in))
+
+
+def generateAddArray(arr1, arr2):
+    #generate the addition array
+    u = min(len(arr1),len(arr2))
+    arr1 = arr1[:u].astype(int)
+    arr2 = arr2[:u].astype(int)
+    
+    fin = arr1 + arr2
+    
+    return(fin)
+
+
+def hammingInterpolation(fin,x,y):
+
+    betterList = []
+    
+    #interpolation method
+    for i in range(len(fin)):       
+        if fin[i] == 2:
+            betterList.append(1)
+        if fin[i] == 0:
+            betterList.append(0)
+    
+        
+    if len(betterList) < 2:
+        inter = x.astype(int)
+    else:
+        x1 = np.linspace(-1, 1, num=len(betterList), endpoint=True)
+        y1 = np.asarray(betterList)
+    
+    
+    
+        lin1 = np.linspace(-1,1,len(fin))
+
+        f = interp1d(x1, y1, kind='nearest')
+        x2 = np.asarray(lin1).astype(float)
+        inter = f(x2)
+        inter = inter.astype(int)
+    
+    
+    
+    return inter
+
+
 #hamming score
 def assembler_ham(fraglist,fragnum,bias):
 
 
     u = np.asarray(fraglist[ 0 ])
-    window = int(math.ceil(len(u) / 4.0))
+    window = int(math.ceil(len(u) * 0.5))
     for i in range(fragnum - 1):
         sumlist = []
         
@@ -106,22 +160,24 @@ def assembler_ham(fraglist,fragnum,bias):
                 score_bias = math.log(j + 1)/(math.log(window))
             elif bias=='logsin':
                 score_bias = (math.sin((j * math.pi)/(window - 1)) + math.log(j + 1)/(math.log(window))) / 1.75
-            elif bias=='sigmoid':
-                score_bias=(1/(1 + math.exp(-j / (window/4.0))) - 0.55) * 2.0
-                
-            elif bias=='tanh':
-                score_bias= math.tanh(j/ (window *0.5))
-
             
             score = (1 - float(sum( (w + x) %2) )/ j)  * score_bias
             
             sumlist.append(score)
 
+                    
         max_portion = sumlist.index(max(sumlist))
+
+        x = u[-max_portion:]
+        y = v[:max_portion]
+        fin = generateAddArray(x,y)
+        middle = hammingInterpolation(fin,x,y)
+        u2 = u[:-max_portion]
+
         v2 = v[max_portion + 1 :]
-        d = np.concatenate((u,v2))
-        u = np.copy(d)
         
+        d = np.concatenate((u2,middle,v2),axis=0)
+        u = np.copy(d)
     
     return  d
 
@@ -140,7 +196,7 @@ def reconstruct1(inf_list,seqnum,bias):
 def assembler_edit(fraglist,fragnum,bias):
 
     u = np.asarray(fraglist[ 0 ])
-    window = int(math.ceil(len(u) / 4.0))
+    window = int(math.ceil(len(u) * 0.5))
     for i in range(fragnum - 1):
         sumlist = []
         
@@ -161,20 +217,23 @@ def assembler_edit(fraglist,fragnum,bias):
                 score_bias = math.log(j + 1)/(math.log(window))
             elif bias=='logsin':
                 score_bias = (math.sin((j * math.pi)/(window - 1)) + math.log(j + 1)/(math.log(window))) / 1.75
-            elif bias=='sigmoid':
-                score_bias=(1/(1 + math.exp(-j / (window/4.0))) - 0.55) * 2.0
-            elif bias=='tanh':
-                score_bias= math.tanh(j/ (window *0.5))
             
             score = (1 - float(lv.distance(str1,str2) / j))  * score_bias
             
             sumlist.append(score)
 
         max_portion = sumlist.index(max(sumlist))
-        v2 = v[max_portion + 1 :]
-        d = np.concatenate((u,v2))
-        u = np.copy(d)
 
+        x = u[-max_portion:]
+        y = v[:max_portion]
+        fin = generateAddArray(x,y)
+        middle = hammingInterpolation(fin,x,y)
+        u2 = u[:-max_portion]
+
+        v2 = v[max_portion + 1 :]
+        
+        d = np.concatenate((u2,middle,v2),axis=0)
+        u = np.copy(d)
     
     return  d
 
