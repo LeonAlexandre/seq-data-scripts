@@ -30,8 +30,8 @@ def parse_arguments():
     parser.add_argument('--assembled',dest="assembled",help='assembled output',type=str,default='please_specify_file.txt')
     parser.add_argument('--labels',dest="labels",help='labels output',type=str,default='please_specify_labels.txt')
     parser.add_argument("--trace",dest="trace",help="trace file to calculate delta",type=str,default=None)
-    parser.add_argument('--mode',dest='mode',help='hamming | edit',type=str,default='hamming')
-    parser.add_argument('--bias',dest='bias',help='log | sin (def) | logsin',type=str,default='sin')
+    parser.add_argument('--mode',dest='mode',help='hamming | edit | none | super | inter',type=str,default='hamming')
+    parser.add_argument('--bias',dest='bias',help='log | sin (def) | logsin | none',type=str,default='sin')
 
     return parser.parse_args()
 

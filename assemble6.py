@@ -20,6 +20,7 @@ import os
 import numpy as np
 import Levenshtein as lv
 import scipy.special as spc
+from scipy.interpolate import interp1d
 
 
 def parse_arguments():
@@ -124,7 +125,7 @@ def find_overlap(length, delta, overlap):
     return(ov)
 
 
-def create_file(outdir):
+def create_file(outdir,assembly):
     
     #current = os.getcwd()
     #path = current + '/' + outdir
@@ -135,7 +136,7 @@ def create_file(outdir):
     else:
         print('Directory ' + outdir + ' already exists!')
 
-    f_out = open(path + '/recons' + '.txt', "w+")
+    f_out = open(path + '/recons_' + assembly + '.txt', "w+")
 
     return f_out
 
@@ -219,7 +220,7 @@ assembly = args.assembly
 
 #process input
 inf_list, seqnum = inference_list(f_in,fragnum)
-f_out = create_file(outdir)
+f_out = create_file(outdir,assembly)
 reconstruct = reconstruct1(inf_list,seqnum,delta,overlap,assembly)
 f_out.write(reconstruct)
 f_out.close()
