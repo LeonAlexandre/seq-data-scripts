@@ -12,6 +12,8 @@ import math
 import os
 import numpy as np
 import Levenshtein as lv
+from weighted_levenshtein import lev
+import time
 
 def parse_arguments():
     """
@@ -53,53 +55,17 @@ def avg_edit(assembled_f,labels_f,seqnum):
     avg = float(avg/seqnum)
     return avg
 
-'''
-def edit2(string1, string2):
-    len1 = len(string1)
-    len2 = len(string2)
-    v = np.zeros([len1+1,len2+1])
-    for i in range(1,len1):
-        v[i,0] = i
-    for j in range(1,len2):
-        v[0,j] = j
-    for i in range(0,len1):
-        for j in range(0,len2):
-            if string1[i] == string2[j]:
-                #v[i+1,j+1] = v[i,j]
-                substitutionCost = 0
-            else:
-                #v[i+1,j+1] = 1 + min(min(v[i+1,j],v[i,j+1]),v[i,j])
-                substitutionCost = 1
-            deletion = v[i,j+1] + 2
-            insertion = v[i+1,j] + 2
-            substitution = v[i,j] + substitutionCost
-            v[i+1,j+1] = min(min(deletion,insertion),substitution)
-    return v[len1,len2]
-'''
-def edit2(s1, s2):
-    if len(s1) < len(s2):
-        return edit2(s2, s1)
-
-    # len(s1) >= len(s2)
-    if len(s2) == 0:
-        return len(s1)
-
-    previous_row = range(len(s2) + 1)
-    for i, c1 in enumerate(s1):
-        current_row = [i + 1]
-        for j, c2 in enumerate(s2):
-            insertions = previous_row[j + 1] + 2 # j+1 instead of j since previous_row and current_row are one character longer
-            deletions = current_row[j] + 2       # than s2
-            substitutions = previous_row[j] + (c1 != c2)
-            current_row.append(min(insertions, deletions, substitutions))
-        previous_row = current_row
-    
-    return previous_row[-1]
-
 def avg_edit2(assembled_f,labels_f,seqnum):
     avg = 0
+    # Make array of costs, can control the edit cost for each opeartion and their application to each character
+    # Example: insert_costs[ord('D')] = 1.5, make inserting the character 'D' have cost 1.5 (instead of 1)
+    insert_costs = np.ones(128, dtype=np.float64) * 2
+    delete_costs = np.ones(128, dtype=np.float64) * 2
+    # Substitution costs can be specified independently in both directions, i.e. a->b can have different cost from b->a
+    # Example: substitute_costs[ord('H'), ord('B')] = 1.25, make substituting 'H' for 'B' cost 1.25
+    subs_costs = np.ones((128,128), dtype=np.float64) * 1
     for (ass,lab) in zip(assembled_f,labels_f):
-        avg += edit2(ass,lab) / len(lab)
+        avg += lev(ass,lab,insert_costs=insert_costs,delete_costs=delete_costs,substitute_costs=subs_costs) / len(lab)
     avg = avg / seqnum
     return avg
 
@@ -137,8 +103,12 @@ def diagnose(assembled_f,labels_f,trace_f,seqnum):
     labels_f = [x.replace(' ','') for x in labels_f]
     trace_f = [x.replace(' ','') for x in trace_f]
 
+    start_time = time.time()
     ed = avg_edit(assembled_f,labels_f,seqnum)
+    print("avg_edit took %s seconds" % (time.time()-start_time))
+    start_time = time.time()
     ed2 = avg_edit2(assembled_f,labels_f,seqnum)
+    print("avg_edit2 took %s seconds" % (time.time()-start_time))
     hd = avg_hamming(assembled_f,labels_f,seqnum)
     delta = avg_delta(assembled_f,trace_f,seqnum)
     len_diff = avg_len_diff(assembled_f,labels_f,seqnum)
