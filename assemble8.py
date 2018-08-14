@@ -10,7 +10,7 @@ Inference file
 Fragnum
 """
 
-#Uses hamming Superposition
+#Uses hamming Interpolation
 
 
 
@@ -106,35 +106,36 @@ def generateAddArray(arr1, arr2):
     return(fin)
 
 
+def hammingInterpolation(fin,x,y):
 
-def hammingSuperposition(fin,x,y):
-    #superposition algorithm
     betterList = []
-    prev = 0
-
-    for i in range(len(fin)):
-        if fin[i] == 1:
-            if prev == x[i]:
-                betterList.append(x[i])
-                betterList.append(y[i])
-                prev = y[i]
-            elif prev == y[i]:
-                betterList.append(y[i])
-                betterList.append(x[i])
-                prev = x[i]
-            
-        else:
-            
-            if fin[i] == 2:
-                betterList.append(1)
-            if fin[i] == 0:
-                betterList.append(0)
-            prev = fin[i]
     
-    betterList = np.asarray(betterList).astype(int)
+    #interpolation method
+    for i in range(len(fin)):       
+        if fin[i] == 2:
+            betterList.append(1)
+        if fin[i] == 0:
+            betterList.append(0)
+    
+        
+    if len(betterList) < 2:
+        inter = x.astype(int)
+    else:
+        x1 = np.linspace(-1, 1, num=len(betterList), endpoint=True)
+        y1 = np.asarray(betterList)
+    
+    
+    
+        lin1 = np.linspace(-1,1,len(fin))
 
-    return betterList
-
+        f = interp1d(x1, y1, kind='nearest')
+        x2 = np.asarray(lin1).astype(float)
+        inter = f(x2)
+        inter = inter.astype(int)
+    
+    
+    
+    return inter
 
 #hamming score
 def assembler_ham(fraglist,fragnum,bias):
@@ -173,7 +174,7 @@ def assembler_ham(fraglist,fragnum,bias):
         x = u[-max_portion:]
         y = v[:max_portion]
         fin = generateAddArray(x,y)
-        middle = hammingSuperposition(fin,x,y)
+        middle = hammingInterpolation(fin,x,y)
         u2 = u[:-max_portion]
 
         v2 = v[max_portion + 1 :]
@@ -229,7 +230,7 @@ def assembler_edit(fraglist,fragnum,bias):
         x = u[-max_portion:]
         y = v[:max_portion]
         fin = generateAddArray(x,y)
-        middle = hammingSuperposition(fin,x,y)
+        middle = hammingInterpolation(fin,x,y)
         u2 = u[:-max_portion]
 
         v2 = v[max_portion + 1 :]

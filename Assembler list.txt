@@ -1,0 +1,10 @@
+Assembler summary:
+Assemble 1: edit/hamming, concat with 0.5 window
+assemble 2: edit/hamming, concat with 0.3 window
+assemble 3: edit/hamming, interpolation with 0.5 window
+assemble 4: edit/hamming, superposition with 0.5 window
+assemble 5: overlap calculation, concat
+assemble 6: overlap calculation inter/super
+assemble 7: edit/hamming,concat full window
+assemble 8: edit/hamming, superposition with full window
+

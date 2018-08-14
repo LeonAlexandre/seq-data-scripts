@@ -45,7 +45,7 @@ def parse_arguments():
 
 def find_overlap(length, delta, overlap):
     fraglen = int(  round(length / (1 + 2 * overlap) ))
-    ov = int(fraglen * overlap)
+    ov = int(fraglen * overlap) * 2
     
 
     return(ov)

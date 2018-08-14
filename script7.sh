@@ -2,11 +2,12 @@
 
 #make it a while loop
 
-foo='/Users/alex/Documents/GitHub/exp_saves/infer_using_seq100by20_04' #parent directory
-bar='data1000by20_04' #place data folder in the foo
-tar='inference_data1000by20_04_assemble7' #name of output dir
-car='test1000_04_infer' #name of inference file
-fragnum=50
+foo='/Users/alex/Desktop/infer_using_seq100by20_04' #parent directory
+bar='data100by20_04' #place data folder in the foo
+tar='inference_data100by20_04_assemble7' #name of output dir
+car='test100_04_infer' #name of inference file
+fragnum=5
+
 
 echo $foo; 
 
