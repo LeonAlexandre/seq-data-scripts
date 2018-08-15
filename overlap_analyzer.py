@@ -7,12 +7,10 @@
 # 
 
 """
-TODo: Rework the reconstrutng function
 
 Arguments:
 Output directory
 Inference file
-Labels
 Frag labels
 Fragnum
 
@@ -93,7 +91,8 @@ def stringify(list_in):
 
 def find_overlap(length,  overlap):
     fraglen = int(  round(length / (1 + (2 * overlap) )))
-    ov = int(fraglen * overlap) * 2
+    
+    ov = int(fraglen * overlap ) *2
     
 
     return(ov)
@@ -185,12 +184,15 @@ def reconstruct_hamming_assembler7(inf_list,seqnum):
 
 def assembler_ass5(fraglist,fragnum, overlap):
     pairs = []
+
     u = np.asarray(fraglist[ 0 ])
     for i in range(fragnum - 1):      
         v = np.asarray(fraglist[ i + 1 ])
         max_portion = find_overlap(len(v), overlap)
+        print(max_portion)
         pairs.append( ( formatter(u[-max_portion:]) , formatter(v[:max_portion])) )
         
+        u = np.copy(v)
     
     return  pairs
 
