@@ -39,12 +39,20 @@ def parse_arguments():
     parser.add_argument('--f_inference',dest="f_in",help='inference input file location (Full path)',type=str,default='test_output.txt')
     parser.add_argument('--fragnum',dest="fragnum",help='number of fragments as int',type=int,default=1)
     parser.add_argument('--overlap', dest="overlap", help='overlap',type=float,default=0.1)
-    parser.add_argument('--delta', dest="delta", help='delta', type=float, default=0.1 )
     return parser.parse_args()
 
 
-def find_overlap(length, delta, overlap):
+def find_overlap(length, overlap):
+
     fraglen = int(  round(length / (1 + 2 * overlap) ))
+    ov = int(fraglen * overlap) * 2
+    
+
+    return(ov)
+
+
+def find_overlap_last(length,overlap):
+    fraglen = int(  round(length / (1 + overlap) ))
     ov = int(fraglen * overlap) * 2
     
 
@@ -68,17 +76,20 @@ def create_file(outdir):
 
 
 def listify(entry):
+    #from string to list
     return list(''.join(entry.split()))
 
 
 def formatter(list_in):
+    #formats the string to the network format
     list_in = ' '.join(str(x) for x in list_in)
     return(list_in)
 
 
 def inference_list(f_in,fragnum):
-    #read lines in a lsit
+    #read lines in a list
     #split the list according to fragnum (list of list)
+    #results ina  three dimensional list. First level is by sequence number. Second level by fragment number. third level is the bit itself.
     __location__ = os.getcwd()
     inference_file = os.path.join(__location__,f_in)
     inference_file = open(f_in,'r')
@@ -98,26 +109,47 @@ def inference_list(f_in,fragnum):
     return inf_list, seqnum
 
 
-def assembler(fraglist,fragnum,delta,overlap):
+def assembler(fraglist,fragnum, overlap):
 
     
 
     u = np.asarray(fraglist[ 0 ])
     for i in range(fragnum - 1):      
         v = np.asarray(fraglist[ i + 1 ])                  
-        max_portion = find_overlap(len(v),delta,overlap)
+        max_portion = find_overlap(len(v), overlap)
         u2 = u[:-max_portion]
         
         d = np.concatenate((u2,v))
         u = np.copy(d)
+
+
+    
+    return  d
+
+def XXXassembler(fraglist,fragnum, overlap):
+
+    
+
+    u = np.asarray(fraglist[ 0 ])
+    for i in range(fragnum - 1):      
+        v = np.asarray(fraglist[ i + 1 ])                  
+        max_portion = find_overlap(len(v), overlap)
+        u2 = u[:-max_portion]
+        
+        d = np.concatenate((u2,v))
+        u = np.copy(d)
+
+
     
     return  d
 
 
-def reconstruct1(inf_list,seqnum,delta,overlap):
+def reconstruct1(inf_list,seqnum, overlap):
+    #reconstructs each sequence and adds it to an output string.
+    #output is the formatted string or assembled sequences
     reconstructed = ''
     for i in range(seqnum):
-        reconstructed = reconstructed + "\n" + formatter(assembler(inf_list[i],fragnum,delta,overlap))
+        reconstructed = reconstructed + "\n" + formatter(assembler(inf_list[i],fragnum, overlap))
     #delete frist line
     reconstructed = reconstructed.split("\n",1)[1]
 
@@ -131,12 +163,12 @@ outdir = args.outdir
 f_in = args.f_in
 fragnum = args.fragnum
 overlap = args.overlap
-delta = args.delta
+
 
 #process input
 inf_list, seqnum = inference_list(f_in,fragnum)
 f_out = create_file(outdir)
-reconstruct = reconstruct1(inf_list,seqnum,delta,overlap)
+reconstruct = reconstruct1(inf_list,seqnum, overlap)
 f_out.write(reconstruct)
 f_out.close()
 
