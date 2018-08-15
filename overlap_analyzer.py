@@ -97,6 +97,14 @@ def find_overlap(length,  overlap):
 
     return(ov)
 
+def find_overlap_last(length,overlap):
+    fraglen = int(  round(length / (1 + overlap) ))
+    ov = int(fraglen * overlap) * 2
+    
+
+    return(ov)
+
+
 #####ASSEMBLER 1 #################
 #hamming score
 def assembler_ham_ass7(fraglist,fragnum):
@@ -195,6 +203,30 @@ def assembler_ass5(fraglist,fragnum, overlap):
     
     return  pairs
 
+def assembler_ass11(fraglist,fragnum, overlap):
+    pairs = []
+    
+
+    u = np.asarray(fraglist[ 0 ])
+    for i in range(fragnum - 2):      
+        v = np.asarray(fraglist[ i + 1 ])                  
+        max_portion = find_overlap(len(v), overlap)
+        u2 = u[:-max_portion]
+        pairs.append( ( formatter(u[-max_portion:]) , formatter(v[:max_portion])) )
+
+        
+        u = np.copy(v)
+    v = np.asarray(fraglist[ fragnum -1 ])                  
+    max_portion = find_overlap_last(len(v), overlap)
+    
+    pairs.append( ( formatter(u[-max_portion:]) , formatter(v[:max_portion])) )
+
+        
+    
+    u = np.copy(v)
+
+    
+    return  pairs
 
 def reconstruct_ass5(inf_list,seqnum, fragnum ,overlap):
     pairsList = []
@@ -204,7 +236,13 @@ def reconstruct_ass5(inf_list,seqnum, fragnum ,overlap):
 
     return pairsList
 
+def reconstruct_ass11(inf_list,seqnum, fragnum ,overlap):
+    pairsList = []
+    for i in range(seqnum):
+        pairs = assembler_ass11(inf_list[i],fragnum, overlap)
+        pairsList.append(pairs)
 
+    return pairsList
 ###Find original overlap regions
 #use find_overlap
 #take from the frag_label
@@ -319,22 +357,26 @@ label_list = original_list(frag_labels, seqnum, overlap)
 p_ass7_out1 = create_file(outdir, 'edit_pairs_ass7')
 p_ass7_out2 = create_file(outdir, 'ham_pairs_ass7')
 p_ass5_out = create_file(outdir,'pairs_ass5')
+p_ass11_out = create_file(outdir,'pairs_ass11')
 pairs_ham_ass7 = reconstruct_hamming_assembler7(inf_list,seqnum)
 pairs_edit_ass7 = reconstruct_edit_assembler7(inf_list,seqnum)
 pairs_ass5 = reconstruct_ass5(inf_list, seqnum, fragnum, overlap)
+pairs_ass11 = reconstruct_ass11(inf_list, seqnum, fragnum, overlap)
 
 report_edit_ass7 = pair_report(pairs_edit_ass7, label_list, seqnum, fragnum)
 report_ham_ass7 = pair_report(pairs_ham_ass7, label_list, seqnum, fragnum)
 report_ass5 = pair_report(pairs_ass5, label_list, seqnum, fragnum)
+report_ass11 = pair_report(pairs_ass11, label_list, seqnum, fragnum)
 
 p_ass7_out1.write(report_edit_ass7)
 p_ass7_out2.write(report_ham_ass7)
 p_ass5_out.write(report_ass5)
+p_ass11_out.write(report_ass11)
 
 p_ass7_out1.close()
 p_ass7_out2.close()
 p_ass5_out.close()
-
+p_ass11_out.close()
 
 
 

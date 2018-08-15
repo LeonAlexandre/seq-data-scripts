@@ -51,13 +51,6 @@ def find_overlap(length, overlap):
     return(ov)
 
 
-def find_overlap_last(length,overlap):
-    fraglen = int(  round(length / (1 + overlap) ))
-    ov = int(fraglen * overlap) * 2
-    
-
-    return(ov)
-
 
 def create_file(outdir):
     
@@ -110,23 +103,6 @@ def inference_list(f_in,fragnum):
 
 
 def assembler(fraglist,fragnum, overlap):
-
-    
-
-    u = np.asarray(fraglist[ 0 ])
-    for i in range(fragnum - 1):      
-        v = np.asarray(fraglist[ i + 1 ])                  
-        max_portion = find_overlap(len(v), overlap)
-        u2 = u[:-max_portion]
-        
-        d = np.concatenate((u2,v))
-        u = np.copy(d)
-
-
-    
-    return  d
-
-def XXXassembler(fraglist,fragnum, overlap):
 
     
 
