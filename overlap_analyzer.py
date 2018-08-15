@@ -189,7 +189,6 @@ def assembler_ass5(fraglist,fragnum, overlap):
     for i in range(fragnum - 1):      
         v = np.asarray(fraglist[ i + 1 ])
         max_portion = find_overlap(len(v), overlap)
-        print(max_portion)
         pairs.append( ( formatter(u[-max_portion:]) , formatter(v[:max_portion])) )
         
         u = np.copy(v)
