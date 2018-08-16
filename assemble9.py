@@ -131,22 +131,22 @@ def reconstruct1(inf_list,seqnum, overlap):
 
     return reconstructed
 
+if __name__ == '__main__':
+    ###MAIN CODE
 
-###MAIN CODE
-
-args = parse_arguments()
-outdir = args.outdir
-f_in = args.f_in
-fragnum = args.fragnum
-overlap = args.overlap
+    args = parse_arguments()
+    outdir = args.outdir
+    f_in = args.f_in
+    fragnum = args.fragnum
+    overlap = args.overlap
 
 
-#process input
-inf_list, seqnum = inference_list(f_in,fragnum)
-f_out = create_file(outdir)
-reconstruct = reconstruct1(inf_list,seqnum, overlap)
-f_out.write(reconstruct)
-f_out.close()
+    #process input
+    inf_list, seqnum = inference_list(f_in,fragnum)
+    f_out = create_file(outdir)
+    reconstruct = reconstruct1(inf_list,seqnum, overlap)
+    f_out.write(reconstruct)
+    f_out.close()
 
 
 
