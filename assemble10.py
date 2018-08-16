@@ -64,6 +64,8 @@ def formatter(list_in):
     return(list_in)
 
 
+
+
 def inference_list(f_in,fragnum):
     #read lines in a lsit
     #split the list according to fragnum (list of list)
@@ -109,7 +111,6 @@ def assembler_ham(fraglist,fragnum,bias):
                 score_bias = math.log(j + 1)/(math.log(window))
             elif bias=='logsin':
                 score_bias = (math.sin((j * math.pi)/(window - 1)) + math.log(j + 1)/(math.log(window))) / 1.75
-            
             
             if w.size == x.size:
                 score = ((1 - float(sum( (w + x) %2) )/ j)  * score_bias )
