@@ -65,7 +65,7 @@ def formatter(list_in):
     return(list_in)
 
 def generate_prob(window, overlap, delta):
-    x = range( window + 1 )
+    x = range( window + 1 )[1:]
     temp=[]
     for i in x:       
         temp.append(  spc.comb(i,overlap) 
@@ -108,7 +108,7 @@ def assembler_ham(fraglist,fragnum,bias ,delta,overlap):
 
     u = np.asarray(fraglist[ 0 ])
     
-    window = int(len(u) )
+    window = int(math.ceil(len(u) * 0.8 ) )
     for i in range(fragnum - 1):
         sumlist = []
         
@@ -128,7 +128,7 @@ def assembler_ham(fraglist,fragnum,bias ,delta,overlap):
             elif bias=='logsin':
                 score_bias = (math.sin((j * math.pi)/(window - 1)) + math.log(j + 1)/(math.log(window))) / 1.75
             elif bias=='prob':
-                score_bias=prob[j] * j
+                score_bias=prob[j ] * j
                 
             
             if w.size == x.size:
@@ -139,8 +139,8 @@ def assembler_ham(fraglist,fragnum,bias ,delta,overlap):
             sumlist.append(score)
                     
         max_portion = sumlist.index(max(sumlist))
-        #if bias=='prob':
-        #    max_portion += 1
+        if bias=='prob':
+            max_portion += 2
             #print(max_portion)
        
         u2 = u[:-max_portion]
@@ -165,7 +165,7 @@ def assembler_edit(fraglist,fragnum,bias, delta,overlap):
 
 
     u = np.asarray(fraglist[ 0 ])
-    window = int(math.ceil(len(u) ))
+    window = int(math.ceil(len(u) * 0.8 ) )
     
     for i in range(fragnum - 1):
         sumlist = []
@@ -200,9 +200,9 @@ def assembler_edit(fraglist,fragnum,bias, delta,overlap):
             sumlist.append(score)
 
         max_portion = sumlist.index(max(sumlist)) 
-        print(max_portion)
-        #if bias=='prob':
-        #    max_portion +=1
+        
+        if bias=='prob':
+            max_portion +=2
             #print(max_portion)
         
         u2 = u[:-max_portion]
