@@ -212,18 +212,16 @@ def assembler_ass11(fraglist,fragnum, overlap):
         v = np.asarray(fraglist[ i + 1 ])                  
         max_portion = find_overlap(len(v), overlap)
         u2 = u[:-max_portion]
-        pairs.append( ( formatter(u[-max_portion:]) , formatter(v[:max_portion])) )
-
         
-        u = np.copy(v)
+        d = np.concatenate((u2,v))
+        u = np.copy(d)
+        pairs.append( ( formatter(u[-max_portion:]) , formatter(v[:max_portion])) )
     v = np.asarray(fraglist[ fragnum -1 ])                  
     max_portion = find_overlap_last(len(v), overlap)
-    
+    u2 = u[:-max_portion]
     pairs.append( ( formatter(u[-max_portion:]) , formatter(v[:max_portion])) )
-
-        
-    
-    u = np.copy(v)
+    d = np.concatenate((u2,v))
+    u = np.copy(d)
 
     
     return  pairs
@@ -354,28 +352,38 @@ frag_labels, seqnum2 = create_list(fragLabels,fragnum)
 label_list = original_list(frag_labels, seqnum, overlap)
 
 #differnt assemblers
+"""
 p_ass7_out1 = create_file(outdir, 'edit_pairs_ass7')
 p_ass7_out2 = create_file(outdir, 'ham_pairs_ass7')
 p_ass5_out = create_file(outdir,'pairs_ass5')
+"""
 p_ass11_out = create_file(outdir,'pairs_ass11')
+"""
 pairs_ham_ass7 = reconstruct_hamming_assembler7(inf_list,seqnum)
 pairs_edit_ass7 = reconstruct_edit_assembler7(inf_list,seqnum)
 pairs_ass5 = reconstruct_ass5(inf_list, seqnum, fragnum, overlap)
+"""
 pairs_ass11 = reconstruct_ass11(inf_list, seqnum, fragnum, overlap)
 
+"""
 report_edit_ass7 = pair_report(pairs_edit_ass7, label_list, seqnum, fragnum)
 report_ham_ass7 = pair_report(pairs_ham_ass7, label_list, seqnum, fragnum)
 report_ass5 = pair_report(pairs_ass5, label_list, seqnum, fragnum)
+"""
 report_ass11 = pair_report(pairs_ass11, label_list, seqnum, fragnum)
 
+"""
 p_ass7_out1.write(report_edit_ass7)
 p_ass7_out2.write(report_ham_ass7)
 p_ass5_out.write(report_ass5)
+"""
 p_ass11_out.write(report_ass11)
 
+"""
 p_ass7_out1.close()
 p_ass7_out2.close()
 p_ass5_out.close()
+"""
 p_ass11_out.close()
 
 

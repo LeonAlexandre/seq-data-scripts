@@ -37,10 +37,14 @@ def callback():
 def allstates(): 
     print(list(lng.state()), list(tgl.state()))
     
-def call_assembler9():
-    string = 'python ./assemble9.py --outdir=' + outdir.get()+ ' --f_inference="' + f_inference.get() +'" --fragnum=' + fragnum.get() +' --overlap=0.4'
+def call_assembler11():
+    string = 'python ./assemble11.py --outdir=' + outdir.get()+ ' --f_inference="' + f_inference.get() +'" --fragnum=' + fragnum.get() +' --overlap=0.4'
     print(string)
     os.system(string)
+    os.system('echo "report"')
+    
+    report = 'python report.py --outdir=' + outdir.get()+ ' --assembled=$foo/$tar/recons.txt --trace=$foo/$bar/test.trace0 --labels=$foo/$bar/test.label --mode=none--bias=none'
+
 
 
 def get_header_field():
@@ -85,7 +89,7 @@ if __name__ == '__main__':
     
     
     
-    Button(root, text='Assemble!', command=call_assembler9).grid( row=9, columnspan=4)
+    Button(root, text='Assemble!', command=call_assembler11).grid( row=9, columnspan=4)
 
     Button(root, text='Quit', command=root.destroy).grid( row=10, column=1)
     
