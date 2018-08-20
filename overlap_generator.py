@@ -149,8 +149,8 @@ def find_original(fraglist,fragnum, overlap):
         v = np.asarray(fraglist[ i + 1 ])                  
         max_portion = find_overlap(len(v), overlap)
         over.append( formatter( v[:max_portion] ) )
-    v = fraglist[fragnum]
-    max_portion = find_overlap(len(v),overlap)
+    v = fraglist[fragnum - 1]
+    max_portion = find_overlap_last(len(v),overlap)
     over.append(formatter(v[:max_portion]))
     
     return  over

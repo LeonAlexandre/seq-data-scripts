@@ -106,7 +106,6 @@ def reg_edit(assembled_f,labels_f,seqnum):
 
     for (ass,lab) in zip(assembled_f,labels_f):
         cut = int(len(ass) / 4 )
-        print(cut)
         ass0 = ass[:cut]
         ass1 = ass[cut: 2*cut]
         ass2 = ass[2 * cut: 3* cut]

@@ -161,7 +161,7 @@ if __name__ == '__main__':
 
     #process input
     inf_list, seqnum = inference_list(f_in,fragnum)
-    mid_list, seqnum2 = inference_list(middle,fragnum)
+    mid_list, seqnum2 = inference_list(middle,fragnum - 1)
     f_out = create_file(outdir)
     reconstruct = reconstruct1(inf_list,seqnum, overlap, mid_list)
     f_out.write(reconstruct)
