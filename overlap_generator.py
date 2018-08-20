@@ -40,6 +40,7 @@ def parse_arguments():
     parser.add_argument('--fragnum',dest="fragnum",help='number of fragments as int',type=int,default=1)
     parser.add_argument('--fragLabels',dest="fragLabels", help='frag_x.label file',type=str,default='frag_test.label')
     parser.add_argument('--overlap', dest="overlap", help='overlap',type=float,default=0.1)
+    parser.add_argument('--name',dest="name", help='name of the output files', type=str, default='overlapX')
     return parser.parse_args()
 
 def create_file(outdir,name):
@@ -258,6 +259,7 @@ fragnum = args.fragnum
 
 overlap = args.overlap
 fragLabels = args.fragLabels
+name = args.name
 
 
 #process input
@@ -271,10 +273,10 @@ label_list = original_list(frag_labels, seqnum, overlap)
 
 #differnt assemblers
 
-p_ass11_out = create_file(outdir,'pairs_ass11.txt')
-f_overlap1 = create_file(outdir, 'overlap.trace0')
-f_overlap2 = create_file(outdir, 'overlap.trace1')
-f_label = create_file(outdir, 'overlap.label')
+p_ass11_out = create_file(outdir, name + 'pairs_ass11.txt')
+f_overlap1 = create_file(outdir, name + '.trace0')
+f_overlap2 = create_file(outdir, name + '.trace1')
+f_label = create_file(outdir, name + '.label')
 
 
 pairs_ass11 = reconstruct_ass11(inf_list, seqnum, fragnum, overlap)
