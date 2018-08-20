@@ -145,11 +145,13 @@ def reconstruct_ass11(inf_list,seqnum, fragnum ,overlap):
 def find_original(fraglist,fragnum, overlap):
     over = []
     
-    for i in range(fragnum - 1):      
+    for i in range(fragnum - 2):      
         v = np.asarray(fraglist[ i + 1 ])                  
         max_portion = find_overlap(len(v), overlap)
         over.append( formatter( v[:max_portion] ) )
-        
+    v = fraglist[fragnum]
+    max_portion = find_overlap(len(v),overlap)
+    over.append(formatter(v[:max_portion]))
     
     return  over
 
