@@ -96,7 +96,6 @@ def kmersify(list_in):
     remain = len(list_in) % mers
     if remain is not 0:
         merlist.append(list_in[-remain:])
-    print(remain)
     merlist = [ stringify(p) for p in merlist]
     
     merlist = formater(merlist)
