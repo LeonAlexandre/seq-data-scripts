@@ -35,9 +35,14 @@ def callback():
 
 
 def allstates(): 
-    print(list(lng.state()), list(tgl.state()))
+    print(list(lng.state()))
     
 def call_assembler11():
+    assemblerList = list(lng.state())
+    
+    
+
+    get_header_field()
     string = 'python ./assemble11.py --outdir=' + outdir.get()+ ' --f_inference="' + f_inference.get() +'" --fragnum=' + fragnum.get() +' --overlap=0.4'
     print(string)
     os.system(string)
@@ -69,25 +74,20 @@ if __name__ == '__main__':
     f_inferenceB = Entry(root)
     fragnumB = Entry(root)
 
-    outdirB.grid( row=0, column= 2, columnspan=5)
-    f_inferenceB.grid( row=1, column =2,  columnspan = 5)
-    fragnumB.grid( row=2, column = 2, columnspan = 5)
+    outdirB.grid( row=0, column= 2, columnspan=50)
+    f_inferenceB.grid( row=1, column =2,  columnspan = 50)
+    fragnumB.grid( row=2, column = 2, columnspan = 50)
     
     outdir = StringVar()
     f_inference = StringVar()
     fragnum = StringVar()
 
-    
-    Button(root, text='Get arguments', command=get_header_field).grid( row=3, columnspan=4)
-
     lng = Checkbar(root, ['Assemble9', 'Assemble10', 'Assemble11'])
-    tgl = Checkbar(root, ['English','German'])
+    
     lng.grid(row = 4 , columnspan=3)
-    tgl.grid(row=5, columnspan=3)
+    
     lng.config(relief=GROOVE, bd=2)
 
-    
-    
     
     Button(root, text='Assemble!', command=call_assembler11).grid( row=9, columnspan=4)
 

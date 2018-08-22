@@ -3,11 +3,11 @@
 #make it a while loop
 
 
-foo='/Users/alex/Documents/GitHub/exp_saves/infer_using_seq2t100by20_04' #parent directory
-bar='data2t100by20_04' #place data folder in the foo
-tar='inference_data2t100by20_04_assemble11' #name of output dir
+foo='/Users/alex/Documents/GitHub/exp_saves/infer_using_seq50by10_04' #parent directory
+bar='data100by10_04' #place data folder in the foo
+tar='inference_data100by10_04_assemble11' #name of output dir
 car='test100_04_infer' #name of inference file
-fragnum=5
+fragnum=10
 over=0.4
 
 
@@ -18,7 +18,7 @@ echo $foo;
 echo "report"
 #python report.py --outdir=$foo/$tar --assembled=$foo/$tar/recons.txt --trace=$foo/$bar/test.trace0 --labels=$foo/$bar/test.label --mode=none--bias=none
 
-python region_analyzer.py --outdir=$foo/$tar --assembled=$foo/$tar/recons.txt --trace=$foo/$bar/test.trace0 --labels=$foo/$bar/test.label --mode=none--bias=none
+python region_analyzer.py --outdir=$foo/$tar --assembled=$foo/$tar/recons.txt --trace=$foo/$bar/test.trace --labels=$foo/$bar/test.label --mode=none--bias=none
 
 ##DONE
 
