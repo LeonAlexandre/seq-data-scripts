@@ -179,7 +179,7 @@ overlap = args.overlap
 inf_list, seqnum = inference_list(f_in,fragnum)
 f_out = create_file(outdir)
 if overlap == 0.0:
-    reconstruct_no_overlap(inf_list,seqnum)
+    reconstruct = reconstruct_no_overlap(inf_list,seqnum)
 else:
     reconstruct = reconstruct1(inf_list,seqnum, overlap)
 f_out.write(reconstruct)
