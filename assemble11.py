@@ -135,12 +135,11 @@ def assembler(fraglist,fragnum, overlap):
 def assembler_no_overlap(fraglist,fragnum):
 
     u = np.asarray(fraglist[ 0 ])
-    for i in range(fragnum - 2):      
+    for i in range(fragnum - 1):      
         v = np.asarray(fraglist[ i + 1 ])                  
         d = np.concatenate((u,v))
         u = np.copy(d)
-    v = np.asarray(fraglist[ fragnum -1 ])  
-    d = np.concatenate((u,v))
+    
     
     return  d
 
