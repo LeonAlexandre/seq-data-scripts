@@ -19,7 +19,7 @@ import math
 import os
 import numpy as np
 import Levenshtein as lv
-import scipy.special as spc
+
 
 
 def parse_arguments():
@@ -109,23 +109,6 @@ def inference_list(f_in,fragnum):
     return inf_list, seqnum
 
 
-def XXXassemblerXXX(fraglist,fragnum, overlap):
-
-    
-
-    u = np.asarray(fraglist[ 0 ])
-    for i in range(fragnum - 1):      
-        v = np.asarray(fraglist[ i + 1 ])                  
-        max_portion = find_overlap(len(v), overlap)
-        u2 = u[:-max_portion]
-        
-        d = np.concatenate((u2,v))
-        u = np.copy(d)
-
-
-    
-    return  d
-
 def assembler(fraglist,fragnum, overlap):
 
     
@@ -149,7 +132,20 @@ def assembler(fraglist,fragnum, overlap):
     return  d
 
 
-def reconstruct1(inf_list,seqnum, overlap):
+def assembler_no_overlap(fraglist,fragnum):
+
+    u = np.asarray(fraglist[ 0 ])
+    for i in range(fragnum - 2):      
+        v = np.asarray(fraglist[ i + 1 ])                  
+        d = np.concatenate((u,v))
+        u = np.copy(d)
+    v = np.asarray(fraglist[ fragnum -1 ])  
+    d = np.concatenate((u,v))
+    
+    return  d
+
+
+def reconstruct1(inf_list,seqnum,overlap):
     #reconstructs each sequence and adds it to an output string.
     #output is the formatted string or assembled sequences
     reconstructed = ''
@@ -160,6 +156,16 @@ def reconstruct1(inf_list,seqnum, overlap):
 
     return reconstructed
 
+def reconstruct_no_overlap(inf_list,seqnum):
+    #reconstructs each sequence and adds it to an output string.
+    #output is the formatted string or assembled sequences
+    reconstructed = ''
+    for i in range(seqnum):
+        reconstructed = reconstructed + "\n" + formatter(assembler_no_overlap(inf_list[i],fragnum))
+    #delete frist line
+    reconstructed = reconstructed.split("\n",1)[1]
+
+    return reconstructed
 
 ###MAIN CODE
 
@@ -173,7 +179,10 @@ overlap = args.overlap
 #process input
 inf_list, seqnum = inference_list(f_in,fragnum)
 f_out = create_file(outdir)
-reconstruct = reconstruct1(inf_list,seqnum, overlap)
+if overlap == 0.0:
+    reconstruct_no_overlap(inf_list,seqnum)
+else:
+    reconstruct = reconstruct1(inf_list,seqnum, overlap)
 f_out.write(reconstruct)
 f_out.close()
 
