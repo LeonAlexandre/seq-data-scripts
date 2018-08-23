@@ -1,0 +1,103 @@
+
+
+
+
+##### Problem description
+
+
+- terminology:
+    -Sequence description
+        -Sequence
+        -Deletion Channel
+        -traces
+        -fragments
+        -overlap
+    - Architecture description
+        -encoder
+        -decoder
+        -attention
+
+
+
+#### Motivation for encoder-decoder architecture
+
+-working with variable length input and output
+-cannot map to classe for classification
+
+- Used in NLP
+- scaling to any length and be flexible
+
+
+### NMT model
+
+
+
+### Handling multiple traces
+
+-concatenated traces: does okay
+
+-2 encoders
+
+-N encoders , concatenated states
+
+-N encoders with attention
+
+
+
+#######Fragmentation of the sequence
+
+-To solve the problem of scaling to long sequences 
+
+Fragmenting:
+    -overlap or no overlap?
+    -of the overlap size
+    -optimal fragment size (10, 20, etc...)
+
+Assembling:
+    -detecting overlaping region
+        - X-correlation method
+        - sliding window methods:
+            -window size?
+            -edit vs hamming distance
+            -score bias: an unreliable method
+        
+        -using probability: biasing based on distribution vs picking the average
+
+    -handling middle region
+        -fragment selection
+        -interpolation
+        -overlap analysis, selecting incoming fragment
+        -training on overlapping regions
+
+
+
+Observation/Results:
+
+-bias methods are not good
+
+-best obtained by using average overlap
+
+-best to train on smaller original sequences
+-best fragment size was 20
+
+
+
+#### Training methods:
+
+-Teacher forcing implications
+-Scheduled output didn't really work
+
+
+
+######## K-mers model
+
+- Increased vocabulary size
+- Less words per sentence 
+- Emphasis on neighborhing characters as opposed to individual words
+- Better performance on 20 length sequences on new benchmark
+
+
+#### Averaging states with N encoders
+
+-The N-encoder concatenated doesn't perform much better than single trace
+-New benchmark
