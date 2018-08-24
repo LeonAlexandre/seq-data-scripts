@@ -5,13 +5,13 @@
 TODo: Rework the reconstrutng function
 
 Arguments:
-Output directory
-Inference file
-Fragnum
+outdir: output directory
+f_inference: inference file location
+fragnum: number of  fragments
+overlap: overlap rate
+
+output: recons.txt for all assembled fragments
 """
-
-
-
 
 import argparse
 import random
@@ -19,8 +19,6 @@ import math
 import os
 import numpy as np
 import Levenshtein as lv
-
-
 
 def parse_arguments():
     """
@@ -38,10 +36,14 @@ def parse_arguments():
     parser.add_argument('--outdir',dest="outdir",help='output directory', type=str,default='newdata')
     parser.add_argument('--f_inference',dest="f_in",help='inference input file location (Full path)',type=str,default='test_output.txt')
     parser.add_argument('--fragnum',dest="fragnum",help='number of fragments as int',type=int,default=1)
-    parser.add_argument('--overlap', dest="overlap", help='overlap',type=float,default=0.1)
+    parser.add_argument('--overlap', dest="overlap", help='overlap rate as 0.XX',type=float,default=0.1)
     return parser.parse_args()
 
 
+"""
+Computes overlap for given incoming fragment. Variation for the last fragment
+
+"""
 def find_overlap(length, overlap):
 
     fraglen = int(  round(length / (1 + 2 * overlap) ))
@@ -49,7 +51,6 @@ def find_overlap(length, overlap):
     
 
     return(ov)
-
 
 def find_overlap_last(length,overlap):
     fraglen = int(  round(length / (1 + overlap) ))
@@ -61,8 +62,7 @@ def find_overlap_last(length,overlap):
 
 def create_file(outdir):
     
-    #current = os.getcwd()
-    #path = current + '/' + outdir
+
     path = outdir
     if not os.path.isdir(path):
         os.mkdir(path)
@@ -111,22 +111,20 @@ def inference_list(f_in,fragnum):
 
 def assembler(fraglist,fragnum, overlap):
 
-    
-
-    u = np.asarray(fraglist[ 0 ])
+    head = np.asarray(fraglist[ 0 ])
     for i in range(fragnum - 2):      
-        v = np.asarray(fraglist[ i + 1 ])                  
-        max_portion = find_overlap(len(v), overlap)
-        u2 = u[:-max_portion]
+        tail = np.asarray(fraglist[ i + 1 ])                  
+        max_portion = find_overlap(len(tail), overlap)
+        head2 = head[:-max_portion]
         
-        d = np.concatenate((u2,v))
-        u = np.copy(d)
-    v = np.asarray(fraglist[ fragnum -1 ])                  
-    max_portion = find_overlap_last(len(v), overlap)
-    u2 = u[:-max_portion]
+        d = np.concatenate((head2,tail))
+        head = np.copy(d)
+    tail = np.asarray(fraglist[ fragnum -1 ])                  
+    max_portion = find_overlap_last(len(tail), overlap)
+    head2 = head[:-max_portion]
         
-    d = np.concatenate((u2,v))
-    u = np.copy(d)
+    d = np.concatenate((head2,tail))
+    head = np.copy(d)
 
     
     return  d
@@ -167,23 +165,24 @@ def reconstruct_no_overlap(inf_list,seqnum):
     return reconstructed
 
 ###MAIN CODE
+if __name__ == '__main__':
 
-args = parse_arguments()
-outdir = args.outdir
-f_in = args.f_in
-fragnum = args.fragnum
-overlap = args.overlap
+    args = parse_arguments()
+    outdir = args.outdir
+    f_in = args.f_in
+    fragnum = args.fragnum
+    overlap = args.overlap
 
 
-#process input
-inf_list, seqnum = inference_list(f_in,fragnum)
-f_out = create_file(outdir)
-if overlap == 0.0:
-    reconstruct = reconstruct_no_overlap(inf_list,seqnum)
-else:
-    reconstruct = reconstruct1(inf_list,seqnum, overlap)
-f_out.write(reconstruct)
-f_out.close()
+    #process input
+    inf_list, seqnum = inference_list(f_in,fragnum)
+    f_out = create_file(outdir)
+    if overlap == 0.0:
+        reconstruct = reconstruct_no_overlap(inf_list,seqnum)
+    else:
+        reconstruct = reconstruct1(inf_list,seqnum, overlap)
+    f_out.write(reconstruct)
+    f_out.close()
 
 
 

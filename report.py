@@ -1,10 +1,15 @@
-#Report
+#Report function
 
-#Made a change
-#    Arguments:
-#    out_dir
-#    assembled file
-#    labels
+"""
+Arguments:
+outdir: output directory
+assembled: location of assembled file
+labels: location of label file
+trace: location of trace file
+mode:for reference in output file
+bias:for reference in output file
+
+"""
 
 import argparse
 import random
@@ -16,12 +21,7 @@ from weighted_levenshtein import lev
 import time
 
 def parse_arguments():
-    """
-    arguments: outdir, assembled, labels
-    
-
-
-    """
+ 
     ##PARSING THROUGH THE ARGUMENTS
     #initialize the parser
     parser = argparse.ArgumentParser()
@@ -55,6 +55,8 @@ def avg_edit(assembled_f,labels_f,seqnum):
     avg = float(avg/seqnum)
     return avg
 
+
+##METRICS
 def avg_edit2(assembled_f,labels_f,seqnum):
     avg = 0
     # Make array of costs, can control the edit cost for each opeartion and their application to each character
@@ -97,6 +99,11 @@ def avg_hamming(assembled_f,labels_f,seqnum):
 
     avg = avg / seqnum
     return avg
+
+"""
+All metrics are measured with sequences in form of strings with no space.
+compatible with singe word or k-mers input formats
+"""
 
 def diagnose(assembled_f,labels_f,trace_f,seqnum):
     assembled_f = [x.replace(' ','') for x in assembled_f]
